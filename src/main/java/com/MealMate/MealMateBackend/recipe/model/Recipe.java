@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -46,8 +47,9 @@ public class Recipe {
 
     private LocalDateTime deletedAt;
 
-    @Column(precision = 3, scale = 2, columnDefinition = "DECIMAL(3,2) DEFAULT 0.0")
-    private Double avgRating;
+    // ✅ CORREGIDO: Cambiar Double a BigDecimal
+    @Column(precision = 3, scale = 2, columnDefinition = "NUMERIC(3,2) DEFAULT 0.0")
+    private BigDecimal avgRating;
 
     @Column(columnDefinition = "INT DEFAULT 0")
     private Integer ratingCount;
@@ -55,4 +57,7 @@ public class Recipe {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<IngredientItem> ingredients;
+
+    @Column(name = "meal_type_id")
+    private Integer mealTypeId;
 }
