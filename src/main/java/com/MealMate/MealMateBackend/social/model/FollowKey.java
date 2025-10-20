@@ -1,18 +1,27 @@
 package com.MealMate.MealMateBackend.social.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
 
 @Embeddable
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FollowKey {
+@EqualsAndHashCode
+public class FollowKey implements Serializable {
+    
     @Column(name = "follower_id")
     private Long followerId;
 
-    @Column(name = "following_id")
-    private Long followingId;
+    // ✅ CORREGIDO: En schema.sql es "followed_id", no "following_id"
+    @Column(name = "followed_id")
+    private Long followedId;
 }

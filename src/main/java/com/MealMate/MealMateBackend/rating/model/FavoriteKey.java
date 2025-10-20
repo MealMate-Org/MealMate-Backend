@@ -1,15 +1,23 @@
 package com.MealMate.MealMateBackend.rating.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
 
 @Embeddable
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FavoriteKey {
+@EqualsAndHashCode
+public class FavoriteKey implements Serializable {
+    
     @Column(name = "user_id")
     private Long userId;
 
