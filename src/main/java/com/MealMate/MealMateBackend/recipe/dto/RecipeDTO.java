@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.MealMate.MealMateBackend.recipe.model.Allergen;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,4 +26,5 @@ public class RecipeDTO {
     private Double avgRating;
     private Integer ratingCount;
     private List<IngredientItem> ingredients;
+    private List<Allergen> allergens;
 }

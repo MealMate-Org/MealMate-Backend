@@ -17,4 +17,5 @@ public class RecipeCreateDTO {
     private Long authorId;
     private Boolean isPublic;
     private List<IngredientItem> ingredients;
+    private List<Integer> allergenIds;
 }

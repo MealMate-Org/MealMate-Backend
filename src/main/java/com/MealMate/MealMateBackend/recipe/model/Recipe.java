@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-
+import com.MealMate.MealMateBackend.user.model.User;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,7 +35,7 @@ public class Recipe {
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
-    private com.MealMate.MealMateBackend.user.model.User author;
+    private User author;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isPublic;
@@ -57,6 +57,10 @@ public class Recipe {
     @Column(columnDefinition = "jsonb")
     private List<IngredientItem> ingredients;
 
+    @ManyToMany
+    @JoinTable(name = "recipe_allergens", joinColumns = @JoinColumn(name = "recipe_id"), inverseJoinColumns = @JoinColumn(name = "allergen_id"))
+    private List<Allergen> allergens;
+    
     @Column(name = "meal_type_id")
     private Integer mealTypeId;
 }
