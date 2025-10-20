@@ -47,7 +47,6 @@ public class Recipe {
 
     private LocalDateTime deletedAt;
 
-    // ✅ CORREGIDO: Cambiar Double a BigDecimal
     @Column(precision = 3, scale = 2, columnDefinition = "NUMERIC(3,2) DEFAULT 0.0")
     private BigDecimal avgRating;
 
