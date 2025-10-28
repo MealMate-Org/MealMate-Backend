@@ -13,13 +13,36 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     
     @Modifying
     @Transactional
-    @Query(value = """
-        DELETE FROM meal_plan_items WHERE recipe_id = :recipeId;
-        DELETE FROM recipe_permissions WHERE recipe_id = :recipeId;
-        DELETE FROM group_recipes WHERE recipe_id = :recipeId;
-        DELETE FROM favorites WHERE recipe_id = :recipeId;
-        DELETE FROM ratings WHERE recipe_id = :recipeId;
-        DELETE FROM nutrition_info WHERE recipe_id = :recipeId;
-        """, nativeQuery = true)
-    void deleteRecipeReferences(@Param("recipeId") Long recipeId);
+    @Query(value = "DELETE FROM meal_plan_items WHERE recipe_id = :recipeId", nativeQuery = true)
+    void deleteMealPlanItemsByRecipeId(@Param("recipeId") Long recipeId);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM recipe_permissions WHERE recipe_id = :recipeId", nativeQuery = true)
+    void deleteRecipePermissionsByRecipeId(@Param("recipeId") Long recipeId);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM group_recipes WHERE recipe_id = :recipeId", nativeQuery = true)
+    void deleteGroupRecipesByRecipeId(@Param("recipeId") Long recipeId);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM favorites WHERE recipe_id = :recipeId", nativeQuery = true)
+    void deleteFavoritesByRecipeId(@Param("recipeId") Long recipeId);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM ratings WHERE recipe_id = :recipeId", nativeQuery = true)
+    void deleteRatingsByRecipeId(@Param("recipeId") Long recipeId);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM nutrition_info WHERE recipe_id = :recipeId", nativeQuery = true)
+    void deleteNutritionInfoByRecipeId(@Param("recipeId") Long recipeId);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM recipe_allergens WHERE recipe_id = :recipeId", nativeQuery = true)
+    void deleteRecipeAllergensByRecipeId(@Param("recipeId") Long recipeId);
 }

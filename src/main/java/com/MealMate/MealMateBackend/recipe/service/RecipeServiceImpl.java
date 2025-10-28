@@ -37,175 +37,10 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    @Transactional
-    public void deleteRecipe(Long id) {
+    public RecipeDTO getRecipeById(Long id) {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
-
-        // 1. Limpiar relaciones ManyToMany (allergens)
-        if (recipe.getAllergens() != null) {
-            recipe.getAllergens().clear();
-            recipeRepository.save(recipe);
-        }
-
-        // 2. Eliminar referencias en otras tablas
-        try {
-            // Usar @Query nativa para eliminar referencias
-            recipeRepository.deleteRecipeReferences(id);
-        } catch (Exception e) {
-            System.err.println("Error eliminando referencias: " + e.getMessage());
-        }
-
-        // 3. Ahora sí eliminar la receta
-        recipeRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional
-    public RecipeDTO createRecipe(RecipeCreateDTO recipeCreateDTO) {
-        // Buscar el autor
-        User author = userRepository.findById(recipeCreateDTO.getAuthorId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Crear la receta
-        Recipe recipe = new Recipe();
-        recipe.setTitle(recipeCreateDTO.getTitle());
-        recipe.setDescription(recipeCreateDTO.getDescription());
-        recipe.setInstructions(recipeCreateDTO.getInstructions());
-        recipe.setImagePath(recipeCreateDTO.getImagePath());
-        recipe.setAuthor(author);
-        recipe.setIsPublic(recipeCreateDTO.getIsPublic());
-
-        // Convertir ingredientes de DTO a Model
-        recipe.setIngredients(convertDtoIngredientsToModel(recipeCreateDTO.getIngredients()));
-
-        recipe.setCreatedAt(LocalDateTime.now());
-        recipe.setAvgRating(BigDecimal.ZERO);
-        recipe.setRatingCount(0);
-        recipe.setMealTypeId(recipeCreateDTO.getMealTypeId());
-
-        // Buscar y asignar alérgenos si existen
-        if (recipeCreateDTO.getAllergenIds() != null && !recipeCreateDTO.getAllergenIds().isEmpty()) {
-            List<Allergen> allergens = allergenRepository.findAllById(recipeCreateDTO.getAllergenIds());
-            recipe.setAllergens(allergens);
-        }
-
-        Recipe savedRecipe = recipeRepository.save(recipe);
-        return convertToDTO(savedRecipe);
-    }
-
-    @Override
-    @Transactional
-    public RecipeDTO updateRecipe(Long id, RecipeDTO recipeDTO) {
-        Recipe recipe = recipeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Recipe not found"));
-
-        // Actualizar campos básicos
-        recipe.setTitle(recipeDTO.getTitle());
-        recipe.setDescription(recipeDTO.getDescription());
-        recipe.setInstructions(recipeDTO.getInstructions());
-        recipe.setImagePath(recipeDTO.getImagePath());
-        recipe.setIsPublic(recipeDTO.getIsPublic());
-
-        // Convertir ingredientes de DTO a Model
-        recipe.setIngredients(convertDtoIngredientsToModel(recipeDTO.getIngredients()));
-
-        recipe.setUpdatedAt(LocalDateTime.now());
-        recipe.setMealTypeId(recipeDTO.getMealTypeId());
-
-        // Actualizar alérgenos si están presentes
-        if (recipeDTO.getAllergens() != null) {
-            List<Integer> allergenIds = recipeDTO.getAllergens().stream()
-                    .map(Allergen::getId)
-                    .collect(Collectors.toList());
-            List<Allergen> allergens = allergenRepository.findAllById(allergenIds);
-            recipe.setAllergens(allergens);
-        }
-
-        Recipe updatedRecipe = recipeRepository.save(recipe);
-        return convertToDTO(updatedRecipe);
-    }
-
-    @Override
-    @Transactional
-    public void deleteRecipe(Long id) {
-        Recipe recipe = recipeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Recipe not found"));
-
-        // Limpiar relaciones ManyToMany antes de eliminar
-        if (recipe.getAllergens() != null) {
-            recipe.getAllergens().clear();
-        }
-        recipeRepository.save(recipe);
-
-        // Ahora sí eliminar
-        recipeRepository.deleteById(id);
-    }
-
-    // ===========================
-    // MÉTODOS DE CONVERSIÓN
-    // ===========================
-
-    /**
-     * Convierte Recipe (model) a RecipeDTO
-     */
-    private RecipeDTO convertToDTO(Recipe recipe) {
-        RecipeDTO dto = new RecipeDTO();
-        dto.setId(recipe.getId());
-        dto.setTitle(recipe.getTitle());
-        dto.setDescription(recipe.getDescription());
-        dto.setInstructions(recipe.getInstructions());
-        dto.setImagePath(recipe.getImagePath());
-        dto.setAuthorId(recipe.getAuthor().getId());
-        dto.setIsPublic(recipe.getIsPublic());
-        dto.setCreatedAt(recipe.getCreatedAt());
-        dto.setUpdatedAt(recipe.getUpdatedAt());
-        dto.setDeletedAt(recipe.getDeletedAt());
-        dto.setAvgRating(recipe.getAvgRating() != null ? recipe.getAvgRating().doubleValue() : 0.0);
-        dto.setRatingCount(recipe.getRatingCount() != null ? recipe.getRatingCount() : 0);
-
-        // Convertir ingredientes de Model a DTO
-        dto.setIngredients(convertModelIngredientsToDto(recipe.getIngredients()));
-
-        dto.setAllergens(recipe.getAllergens());
-        dto.setMealTypeId(recipe.getMealTypeId());
-        return dto;
-    }
-
-    /**
-     * Convierte List<dto.IngredientItem> a List<model.IngredientItem>
-     */
-    private List<com.MealMate.MealMateBackend.recipe.model.IngredientItem> convertDtoIngredientsToModel(
-            List<com.MealMate.MealMateBackend.recipe.dto.IngredientItem> dtoIngredients) {
-
-        if (dtoIngredients == null) {
-            return null;
-        }
-
-        return dtoIngredients.stream()
-                .map(dto -> new com.MealMate.MealMateBackend.recipe.model.IngredientItem(
-                        dto.getName(),
-                        dto.getQuantity(),
-                        dto.getUnit()))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Convierte List<model.IngredientItem> a List<dto.IngredientItem>
-     */
-    private List<com.MealMate.MealMateBackend.recipe.dto.IngredientItem> convertModelIngredientsToDto(
-            List<com.MealMate.MealMateBackend.recipe.model.IngredientItem> modelIngredients) {
-
-        if (modelIngredients == null) {
-            return null;
-        }
-
-        return modelIngredients.stream()
-                .map(model -> new com.MealMate.MealMateBackend.recipe.dto.IngredientItem(
-                        model.getName(),
-                        model.getQuantity(),
-                        model.getUnit()))
-                .collect(Collectors.toList());
+        return convertToDTO(recipe);
     }
 
     @Override
@@ -221,6 +56,150 @@ public class RecipeServiceImpl implements RecipeService {
         return recipeRepository.findAll().stream()
                 .filter(recipe -> recipe.getAuthor().getId().equals(authorId))
                 .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteRecipe(Long id) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found"));
+
+        try {
+            // 1. Limpiar relaciones ManyToMany
+            if (recipe.getAllergens() != null) {
+                recipe.getAllergens().clear();
+                recipeRepository.save(recipe);
+                recipeRepository.flush(); // Forzar guardado
+            }
+
+            // 2. Eliminar referencias usando los métodos individuales
+            recipeRepository.deleteMealPlanItemsByRecipeId(id);
+            recipeRepository.deleteRecipePermissionsByRecipeId(id);
+            recipeRepository.deleteGroupRecipesByRecipeId(id);
+            recipeRepository.deleteFavoritesByRecipeId(id);
+            recipeRepository.deleteRatingsByRecipeId(id);
+            recipeRepository.deleteNutritionInfoByRecipeId(id);
+            recipeRepository.deleteRecipeAllergensByRecipeId(id);
+
+            // 3. Eliminar la receta
+            recipeRepository.deleteById(id);
+            recipeRepository.flush();
+            
+            System.out.println("✅ Receta " + id + " eliminada exitosamente");
+        } catch (Exception e) {
+            System.err.println("❌ Error eliminando receta " + id + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al eliminar la receta: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public RecipeDTO createRecipe(RecipeCreateDTO recipeCreateDTO) {
+        User author = userRepository.findById(recipeCreateDTO.getAuthorId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Recipe recipe = new Recipe();
+        recipe.setTitle(recipeCreateDTO.getTitle());
+        recipe.setDescription(recipeCreateDTO.getDescription());
+        recipe.setInstructions(recipeCreateDTO.getInstructions());
+        recipe.setImagePath(recipeCreateDTO.getImagePath());
+        recipe.setAuthor(author);
+        recipe.setIsPublic(recipeCreateDTO.getIsPublic());
+        recipe.setIngredients(convertDtoIngredientsToModel(recipeCreateDTO.getIngredients()));
+        recipe.setCreatedAt(LocalDateTime.now());
+        recipe.setAvgRating(BigDecimal.ZERO);
+        recipe.setRatingCount(0);
+        recipe.setMealTypeId(recipeCreateDTO.getMealTypeId());
+
+        if (recipeCreateDTO.getAllergenIds() != null && !recipeCreateDTO.getAllergenIds().isEmpty()) {
+            List<Allergen> allergens = allergenRepository.findAllById(recipeCreateDTO.getAllergenIds());
+            recipe.setAllergens(allergens);
+        }
+
+        Recipe savedRecipe = recipeRepository.save(recipe);
+        return convertToDTO(savedRecipe);
+    }
+
+    @Override
+    @Transactional
+    public RecipeDTO updateRecipe(Long id, RecipeDTO recipeDTO) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found"));
+
+        recipe.setTitle(recipeDTO.getTitle());
+        recipe.setDescription(recipeDTO.getDescription());
+        recipe.setInstructions(recipeDTO.getInstructions());
+        recipe.setImagePath(recipeDTO.getImagePath());
+        recipe.setIsPublic(recipeDTO.getIsPublic());
+        recipe.setIngredients(convertDtoIngredientsToModel(recipeDTO.getIngredients()));
+        recipe.setUpdatedAt(LocalDateTime.now());
+        recipe.setMealTypeId(recipeDTO.getMealTypeId());
+
+        if (recipeDTO.getAllergens() != null) {
+            List<Integer> allergenIds = recipeDTO.getAllergens().stream()
+                    .map(Allergen::getId)
+                    .collect(Collectors.toList());
+            List<Allergen> allergens = allergenRepository.findAllById(allergenIds);
+            recipe.setAllergens(allergens);
+        }
+
+        Recipe updatedRecipe = recipeRepository.save(recipe);
+        return convertToDTO(updatedRecipe);
+    }
+
+    // ===========================
+    // MÉTODOS DE CONVERSIÓN
+    // ===========================
+
+    private RecipeDTO convertToDTO(Recipe recipe) {
+        RecipeDTO dto = new RecipeDTO();
+        dto.setId(recipe.getId());
+        dto.setTitle(recipe.getTitle());
+        dto.setDescription(recipe.getDescription());
+        dto.setInstructions(recipe.getInstructions());
+        dto.setImagePath(recipe.getImagePath());
+        dto.setAuthorId(recipe.getAuthor().getId());
+        dto.setIsPublic(recipe.getIsPublic());
+        dto.setCreatedAt(recipe.getCreatedAt());
+        dto.setUpdatedAt(recipe.getUpdatedAt());
+        dto.setDeletedAt(recipe.getDeletedAt());
+        dto.setAvgRating(recipe.getAvgRating() != null ? recipe.getAvgRating().doubleValue() : 0.0);
+        dto.setRatingCount(recipe.getRatingCount() != null ? recipe.getRatingCount() : 0);
+        dto.setIngredients(convertModelIngredientsToDto(recipe.getIngredients()));
+        dto.setAllergens(recipe.getAllergens());
+        dto.setMealTypeId(recipe.getMealTypeId());
+        return dto;
+    }
+
+    private List<com.MealMate.MealMateBackend.recipe.model.IngredientItem> convertDtoIngredientsToModel(
+            List<com.MealMate.MealMateBackend.recipe.dto.IngredientItem> dtoIngredients) {
+
+        if (dtoIngredients == null) {
+            return null;
+        }
+
+        return dtoIngredients.stream()
+                .map(dto -> new com.MealMate.MealMateBackend.recipe.model.IngredientItem(
+                        dto.getName(),
+                        dto.getQuantity(),
+                        dto.getUnit()))
+                .collect(Collectors.toList());
+    }
+
+    private List<com.MealMate.MealMateBackend.recipe.dto.IngredientItem> convertModelIngredientsToDto(
+            List<com.MealMate.MealMateBackend.recipe.model.IngredientItem> modelIngredients) {
+
+        if (modelIngredients == null) {
+            return null;
+        }
+
+        return modelIngredients.stream()
+                .map(model -> new com.MealMate.MealMateBackend.recipe.dto.IngredientItem(
+                        model.getName(),
+                        model.getQuantity(),
+                        model.getUnit()))
                 .collect(Collectors.toList());
     }
 }
