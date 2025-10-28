@@ -19,9 +19,16 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public List<FavoriteDTO> getAllFavorites() {
-        return favoriteRepository.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+        try {
+            List<Favorite> favorites = favoriteRepository.findAll();
+            return favorites.stream()
+                    .map(this::mapToDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Error al obtener favoritos: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al obtener favoritos", e);
+        }
     }
 
     @Override
@@ -33,22 +40,36 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public FavoriteDTO createFavorite(FavoriteDTO favoriteDTO) {
-        Favorite favorite = new Favorite();
-        FavoriteKey key = new FavoriteKey(favoriteDTO.getUserId(), favoriteDTO.getRecipeId());
-        favorite.setId(key);
-        favorite.setCreatedAt(LocalDateTime.now());
-        
-        Favorite savedFavorite = favoriteRepository.save(favorite);
-        return mapToDTO(savedFavorite);
+        try {
+            Favorite favorite = new Favorite();
+            FavoriteKey key = new FavoriteKey(favoriteDTO.getUserId(), favoriteDTO.getRecipeId());
+            favorite.setId(key);
+            favorite.setCreatedAt(LocalDateTime.now());
+            
+            Favorite savedFavorite = favoriteRepository.save(favorite);
+            return mapToDTO(savedFavorite);
+        } catch (Exception e) {
+            System.err.println("Error al crear favorito: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al crear favorito", e);
+        }
     }
 
     @Override
     public void deleteFavorite(Long userId, Long recipeId) {
-        favoriteRepository.deleteByUserIdAndRecipeId(userId, recipeId);
+        try {
+            favoriteRepository.deleteByUserIdAndRecipeId(userId, recipeId);
+        } catch (Exception e) {
+            System.err.println("Error al eliminar favorito: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al eliminar favorito", e);
+        }
     }
 
-    // Método auxiliar para mapear manualmente
     private FavoriteDTO mapToDTO(Favorite favorite) {
+        if (favorite == null || favorite.getId() == null) {
+            return null;
+        }
         FavoriteDTO dto = new FavoriteDTO();
         dto.setUserId(favorite.getId().getUserId());
         dto.setRecipeId(favorite.getId().getRecipeId());
