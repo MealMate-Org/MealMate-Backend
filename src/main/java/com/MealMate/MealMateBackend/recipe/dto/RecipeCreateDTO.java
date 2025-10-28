@@ -18,4 +18,5 @@ public class RecipeCreateDTO {
     private Boolean isPublic;
     private List<IngredientItem> ingredients;
     private List<Integer> allergenIds;
+    private Integer mealTypeId;  // ← AÑADIR ESTE CAMPO
 }

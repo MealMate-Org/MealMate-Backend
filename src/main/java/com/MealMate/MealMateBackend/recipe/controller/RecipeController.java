@@ -17,8 +17,20 @@ public class RecipeController {
     private RecipeService recipeService;
 
     @GetMapping
-    public ResponseEntity<List<RecipeDTO>> getAllRecipes() {
-        return ResponseEntity.ok(recipeService.getAllRecipes());
+    public ResponseEntity<List<RecipeDTO>> getAllRecipes(
+            @RequestParam(required = false) Boolean isPublic,
+            @RequestParam(required = false) Long authorId) {
+        
+        if (isPublic != null && isPublic) {
+            // Solo recetas públicas
+            return ResponseEntity.ok(recipeService.getPublicRecipes());
+        } else if (authorId != null) {
+            // Solo recetas del autor
+            return ResponseEntity.ok(recipeService.getRecipesByAuthor(authorId));
+        } else {
+            // Todas las recetas
+            return ResponseEntity.ok(recipeService.getAllRecipes());
+        }
     }
 
     @GetMapping("/{id}")

@@ -27,4 +27,5 @@ public class RecipeDTO {
     private Integer ratingCount;
     private List<IngredientItem> ingredients;
     private List<Allergen> allergens;
+    private Integer mealTypeId;  // ← AÑADIR ESTE CAMPO
 }

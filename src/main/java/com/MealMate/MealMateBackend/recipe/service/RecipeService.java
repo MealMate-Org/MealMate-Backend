@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface RecipeService {
     List<RecipeDTO> getAllRecipes();
+    List<RecipeDTO> getPublicRecipes();
+    List<RecipeDTO> getRecipesByAuthor(Long authorId);
     RecipeDTO getRecipeById(Long id);
     RecipeDTO createRecipe(RecipeCreateDTO recipeCreateDTO);
     RecipeDTO updateRecipe(Long id, RecipeDTO recipeDTO);

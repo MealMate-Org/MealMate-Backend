@@ -18,10 +18,13 @@ public class FavoriteController {
 
     @GetMapping
     public ResponseEntity<List<FavoriteDTO>> getAllFavorites() {
+        System.out.println("🔍 GET /api/v1/favorites - Petición recibida"); // ← AÑADE ESTO
         try {
             List<FavoriteDTO> favorites = favoriteService.getAllFavorites();
+            System.out.println("✅ Favoritos encontrados: " + favorites.size()); // ← AÑADE ESTO
             return ResponseEntity.ok(favorites);
         } catch (Exception e) {
+            System.err.println("❌ Error: " + e.getMessage()); // ← AÑADE ESTO
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
