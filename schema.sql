@@ -90,7 +90,7 @@ date DATE NOT NULL
 CREATE TABLE ratings (
 user_id BIGINT NOT NULL REFERENCES users(id),
 recipe_id BIGINT NOT NULL REFERENCES recipes(id),
-rating NUMERIC(2,1) NOT NULL CHECK (rating >= 0 AND rating <= 5),
+score NUMERIC(2,1) NOT NULL CHECK (score >= 0 AND score <= 5),
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (user_id, recipe_id)
 );

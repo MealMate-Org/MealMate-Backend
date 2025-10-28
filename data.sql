@@ -129,7 +129,7 @@ INSERT INTO meal_plan_items (meal_plan_id, recipe_id, meal_type_id, date) VALUES
 (2, 6, 2, '2025-10-14'),  -- Pasta (Comida)
 (2, 10,2, '2025-10-14');  -- Sopa Verduras (Comida)
 -- === 13. VALORACIONES ===
-INSERT INTO ratings (user_id, recipe_id, rating) VALUES
+INSERT INTO ratings (user_id, recipe_id, score) VALUES
 (2, 1, 5.0), -- Maria ama Ensalada César
 (2, 2, 4.5), -- Maria ama Sopa Lentejas
 (3, 1, 4.0), -- Juan valora Ensalada César
