@@ -60,39 +60,66 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    @Transactional
-    public void deleteRecipe(Long id) {
-        Recipe recipe = recipeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Recipe not found"));
+@Transactional
+public void deleteRecipe(Long id) {
+    System.out.println("🗑️ ===== INICIANDO ELIMINACIÓN DE RECETA " + id + " =====");
+    
+    Recipe recipe = recipeRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
-        try {
-            // 1. Limpiar relaciones ManyToMany
-            if (recipe.getAllergens() != null) {
-                recipe.getAllergens().clear();
-                recipeRepository.save(recipe);
-                recipeRepository.flush(); // Forzar guardado
-            }
+    System.out.println("✅ Receta encontrada: " + recipe.getTitle());
 
-            // 2. Eliminar referencias usando los métodos individuales
-            recipeRepository.deleteMealPlanItemsByRecipeId(id);
-            recipeRepository.deleteRecipePermissionsByRecipeId(id);
-            recipeRepository.deleteGroupRecipesByRecipeId(id);
-            recipeRepository.deleteFavoritesByRecipeId(id);
-            recipeRepository.deleteRatingsByRecipeId(id);
-            recipeRepository.deleteNutritionInfoByRecipeId(id);
-            recipeRepository.deleteRecipeAllergensByRecipeId(id);
-
-            // 3. Eliminar la receta
-            recipeRepository.deleteById(id);
-            recipeRepository.flush();
-            
-            System.out.println("✅ Receta " + id + " eliminada exitosamente");
-        } catch (Exception e) {
-            System.err.println("❌ Error eliminando receta " + id + ": " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Error al eliminar la receta: " + e.getMessage(), e);
+    try {
+        // 1. Limpiar relaciones ManyToMany PRIMERO
+        System.out.println("🔄 Limpiando relaciones ManyToMany...");
+        if (recipe.getAllergens() != null && !recipe.getAllergens().isEmpty()) {
+            System.out.println("   - Alérgenos a limpiar: " + recipe.getAllergens().size());
+            recipe.getAllergens().clear();
+            recipeRepository.saveAndFlush(recipe);
         }
+
+        // 2. Eliminar referencias en ORDEN CORRECTO
+        System.out.println("🔄 Eliminando referencias en otras tablas...");
+        
+        System.out.println("   - Eliminando meal_plan_items...");
+        recipeRepository.deleteMealPlanItemsByRecipeId(id);
+        
+        System.out.println("   - Eliminando recipe_permissions...");
+        recipeRepository.deleteRecipePermissionsByRecipeId(id);
+        
+        System.out.println("   - Eliminando group_recipes...");
+        recipeRepository.deleteGroupRecipesByRecipeId(id);
+        
+        System.out.println("   - Eliminando favorites...");
+        recipeRepository.deleteFavoritesByRecipeId(id);
+        
+        System.out.println("   - Eliminando ratings...");
+        recipeRepository.deleteRatingsByRecipeId(id);
+        
+        System.out.println("   - Eliminando nutrition_info...");
+        recipeRepository.deleteNutritionInfoByRecipeId(id);
+        
+        System.out.println("   - Eliminando recipe_allergens...");
+        recipeRepository.deleteRecipeAllergensByRecipeId(id);
+
+        // 3. Flush para asegurar que todo se ejecutó
+        recipeRepository.flush();
+
+        // 4. AHORA SÍ eliminar la receta
+        System.out.println("🗑️ Eliminando la receta principal...");
+        recipeRepository.deleteById(id);
+        recipeRepository.flush();
+        
+        System.out.println("✅ ===== RECETA " + id + " ELIMINADA EXITOSAMENTE =====");
+    } catch (Exception e) {
+        System.err.println("❌ ===== ERROR ELIMINANDO RECETA " + id + " =====");
+        System.err.println("Tipo de error: " + e.getClass().getName());
+        System.err.println("Mensaje: " + e.getMessage());
+        System.err.println("Causa raíz: " + (e.getCause() != null ? e.getCause().getMessage() : "N/A"));
+        e.printStackTrace();
+        throw new RuntimeException("Error al eliminar la receta: " + e.getMessage(), e);
     }
+}
 
     @Override
     @Transactional

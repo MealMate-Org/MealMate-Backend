@@ -1,7 +1,44 @@
 -- =====================================================
 -- MEAL MATE - DATOS DE PRUEBA COMPLETOS
--- 3 Usuarios, 10 Recetas, 2 Planes, etc.
 -- =====================================================
+
+-- ============================================
+-- IMPORTANTE: RESETEAR SECUENCIAS AL INICIO
+-- ============================================
+ALTER SEQUENCE roles_id_seq RESTART WITH 1;
+ALTER SEQUENCE users_id_seq RESTART WITH 1;
+ALTER SEQUENCE diets_id_seq RESTART WITH 1;
+ALTER SEQUENCE allergens_id_seq RESTART WITH 1;
+ALTER SEQUENCE meal_types_id_seq RESTART WITH 1;
+ALTER SEQUENCE recipes_id_seq RESTART WITH 1;
+ALTER SEQUENCE meal_plans_id_seq RESTART WITH 1;
+ALTER SEQUENCE meal_plan_items_id_seq RESTART WITH 1;
+ALTER SEQUENCE shopping_lists_id_seq RESTART WITH 1;
+ALTER SEQUENCE groups_id_seq RESTART WITH 1;
+ALTER SEQUENCE user_allergens_id_seq RESTART WITH 1;
+
+-- ============================================
+-- LIMPIAR DATOS EXISTENTES
+-- ============================================
+TRUNCATE TABLE shopping_lists CASCADE;
+TRUNCATE TABLE group_recipes CASCADE;
+TRUNCATE TABLE group_members CASCADE;
+TRUNCATE TABLE groups CASCADE;
+TRUNCATE TABLE follows CASCADE;
+TRUNCATE TABLE meal_plan_items CASCADE;
+TRUNCATE TABLE meal_plans CASCADE;
+TRUNCATE TABLE ratings CASCADE;
+TRUNCATE TABLE favorites CASCADE;
+TRUNCATE TABLE recipe_allergens CASCADE;
+TRUNCATE TABLE nutrition_info CASCADE;
+TRUNCATE TABLE recipes CASCADE;
+TRUNCATE TABLE meal_types CASCADE;
+TRUNCATE TABLE user_allergens CASCADE;
+TRUNCATE TABLE user_preferences CASCADE;
+TRUNCATE TABLE allergens CASCADE;
+TRUNCATE TABLE diets CASCADE;
+TRUNCATE TABLE users CASCADE;
+TRUNCATE TABLE roles CASCADE;
 -- === 1. ROLES ===
 INSERT INTO roles (name) VALUES
 ('ADMIN'),
