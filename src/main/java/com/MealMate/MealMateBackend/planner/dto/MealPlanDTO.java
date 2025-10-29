@@ -13,8 +13,7 @@ import java.time.LocalDate;
 public class MealPlanDTO {
     private Long id;
     private Long userId;
-    private LocalDate weekStart;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
 }

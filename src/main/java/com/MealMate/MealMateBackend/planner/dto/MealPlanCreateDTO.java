@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MealPlanCreateDTO {
     private Long userId;
-    private LocalDate weekStart;
+    private LocalDate startDate;
+    private LocalDate endDate;
 }

@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./reset-database.sql:/docker-entrypoint-initdb.d/00-reset-database.sql
       - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - ./data-bcrypt.sql:/docker-entrypoint-initdb.d/02-data.sql
     networks:
       - mealmate-network
     healthcheck:

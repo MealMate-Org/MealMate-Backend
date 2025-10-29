@@ -22,13 +22,19 @@ public class MealPlan {
     @JoinColumn(name = "user_id", nullable = false)
     private com.MealMate.MealMateBackend.user.model.User user;
 
-    @Column(nullable = false)
-    private LocalDate weekStart;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
+
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
-
-    private LocalDateTime deletedAt;
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }
