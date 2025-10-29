@@ -30,14 +30,33 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        System.out.println("🔍 CustomUserDetailsService - Buscando usuario: " + email);
+        
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
+                .orElseThrow(() -> {
+                    System.err.println("❌ Usuario no encontrado: " + email);
+                    return new UsernameNotFoundException("Usuario no encontrado con email: " + email);
+                });
 
-        return new org.springframework.security.core.userdetails.User(
+        System.out.println("✅ Usuario encontrado:");
+        System.out.println("   - ID: " + user.getId());
+        System.out.println("   - Username: " + user.getUsername());
+        System.out.println("   - Email: " + user.getEmail());
+        System.out.println("   - Rol: " + user.getRole().getName());
+        System.out.println("   - Password hash: " + user.getPassword().substring(0, 20) + "...");
+
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(user);
+        System.out.println("   - Authorities: " + authorities);
+
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                getAuthorities(user)
+                authorities
         );
+
+        System.out.println("✅ UserDetails creado exitosamente");
+        
+        return userDetails;
     }
 
     /**
@@ -47,6 +66,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Por ahora, solo usamos el rol del usuario
         // Formato: ROLE_ADMIN, ROLE_USER, etc.
         String roleName = "ROLE_" + user.getRole().getName();
+        System.out.println("🔐 Rol asignado: " + roleName);
         return Collections.singletonList(new SimpleGrantedAuthority(roleName));
     }
 }

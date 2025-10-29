@@ -11,6 +11,8 @@ import com.MealMate.MealMateBackend.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -60,66 +62,79 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-@Transactional
-public void deleteRecipe(Long id) {
-    System.out.println("🗑️ ===== INICIANDO ELIMINACIÓN DE RECETA " + id + " =====");
-    
-    Recipe recipe = recipeRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Recipe not found"));
+    @Transactional
+    public void deleteRecipe(Long id) {
+        System.out.println("🗑️ ===== INICIANDO ELIMINACIÓN DE RECETA " + id + " =====");
 
-    System.out.println("✅ Receta encontrada: " + recipe.getTitle());
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
-    try {
-        // 1. Limpiar relaciones ManyToMany PRIMERO
-        System.out.println("🔄 Limpiando relaciones ManyToMany...");
-        if (recipe.getAllergens() != null && !recipe.getAllergens().isEmpty()) {
-            System.out.println("   - Alérgenos a limpiar: " + recipe.getAllergens().size());
-            recipe.getAllergens().clear();
-            recipeRepository.saveAndFlush(recipe);
+        // ✅ VERIFICAR QUE EL USUARIO AUTENTICADO SEA EL AUTOR
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!recipe.getAuthor().getId().equals(currentUser.getId())) {
+            System.err.println(
+                    "❌ PERMISO DENEGADO: Usuario " + currentUser.getId() + " no es el autor de la receta " + id);
+            throw new RuntimeException("No tienes permiso para eliminar esta receta");
         }
 
-        // 2. Eliminar referencias en ORDEN CORRECTO
-        System.out.println("🔄 Eliminando referencias en otras tablas...");
-        
-        System.out.println("   - Eliminando meal_plan_items...");
-        recipeRepository.deleteMealPlanItemsByRecipeId(id);
-        
-        System.out.println("   - Eliminando recipe_permissions...");
-        recipeRepository.deleteRecipePermissionsByRecipeId(id);
-        
-        System.out.println("   - Eliminando group_recipes...");
-        recipeRepository.deleteGroupRecipesByRecipeId(id);
-        
-        System.out.println("   - Eliminando favorites...");
-        recipeRepository.deleteFavoritesByRecipeId(id);
-        
-        System.out.println("   - Eliminando ratings...");
-        recipeRepository.deleteRatingsByRecipeId(id);
-        
-        System.out.println("   - Eliminando nutrition_info...");
-        recipeRepository.deleteNutritionInfoByRecipeId(id);
-        
-        System.out.println("   - Eliminando recipe_allergens...");
-        recipeRepository.deleteRecipeAllergensByRecipeId(id);
+        System.out.println("✅ Verificación de permisos OK: Usuario " + currentUser.getId() + " es el autor");
+        System.out.println("✅ Receta encontrada: " + recipe.getTitle());
 
-        // 3. Flush para asegurar que todo se ejecutó
-        recipeRepository.flush();
+        try {
+            // 1. Limpiar relaciones ManyToMany PRIMERO
+            System.out.println("🔄 Limpiando relaciones ManyToMany...");
+            if (recipe.getAllergens() != null && !recipe.getAllergens().isEmpty()) {
+                System.out.println("   - Alérgenos a limpiar: " + recipe.getAllergens().size());
+                recipe.getAllergens().clear();
+                recipeRepository.saveAndFlush(recipe);
+            }
 
-        // 4. AHORA SÍ eliminar la receta
-        System.out.println("🗑️ Eliminando la receta principal...");
-        recipeRepository.deleteById(id);
-        recipeRepository.flush();
-        
-        System.out.println("✅ ===== RECETA " + id + " ELIMINADA EXITOSAMENTE =====");
-    } catch (Exception e) {
-        System.err.println("❌ ===== ERROR ELIMINANDO RECETA " + id + " =====");
-        System.err.println("Tipo de error: " + e.getClass().getName());
-        System.err.println("Mensaje: " + e.getMessage());
-        System.err.println("Causa raíz: " + (e.getCause() != null ? e.getCause().getMessage() : "N/A"));
-        e.printStackTrace();
-        throw new RuntimeException("Error al eliminar la receta: " + e.getMessage(), e);
+            // 2. Eliminar referencias en ORDEN CORRECTO
+            System.out.println("🔄 Eliminando referencias en otras tablas...");
+
+            System.out.println("   - Eliminando meal_plan_items...");
+            recipeRepository.deleteMealPlanItemsByRecipeId(id);
+
+            System.out.println("   - Eliminando recipe_permissions...");
+            recipeRepository.deleteRecipePermissionsByRecipeId(id);
+
+            System.out.println("   - Eliminando group_recipes...");
+            recipeRepository.deleteGroupRecipesByRecipeId(id);
+
+            System.out.println("   - Eliminando favorites...");
+            recipeRepository.deleteFavoritesByRecipeId(id);
+
+            System.out.println("   - Eliminando ratings...");
+            recipeRepository.deleteRatingsByRecipeId(id);
+
+            System.out.println("   - Eliminando nutrition_info...");
+            recipeRepository.deleteNutritionInfoByRecipeId(id);
+
+            System.out.println("   - Eliminando recipe_allergens...");
+            recipeRepository.deleteRecipeAllergensByRecipeId(id);
+
+            // 3. Flush para asegurar que todo se ejecutó
+            recipeRepository.flush();
+
+            // 4. AHORA SÍ eliminar la receta
+            System.out.println("🗑️ Eliminando la receta principal...");
+            recipeRepository.deleteById(id);
+            recipeRepository.flush();
+
+            System.out.println("✅ ===== RECETA " + id + " ELIMINADA EXITOSAMENTE =====");
+        } catch (Exception e) {
+            System.err.println("❌ ===== ERROR ELIMINANDO RECETA " + id + " =====");
+            System.err.println("Tipo de error: " + e.getClass().getName());
+            System.err.println("Mensaje: " + e.getMessage());
+            System.err.println("Causa raíz: " + (e.getCause() != null ? e.getCause().getMessage() : "N/A"));
+            e.printStackTrace();
+            throw new RuntimeException("Error al eliminar la receta: " + e.getMessage(), e);
+        }
     }
-}
 
     @Override
     @Transactional
