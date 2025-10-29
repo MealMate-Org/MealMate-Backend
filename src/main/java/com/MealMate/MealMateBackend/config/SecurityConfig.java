@@ -31,7 +31,10 @@ import java.util.Arrays;
  * - Rutas públicas y protegidas
  * - BCrypt para encriptación de contraseñas
  * 
- * ✅ VERSIÓN FINAL: Sin warnings (Spring Boot 3.5.6)
+ * ✅ VERSIÓN ACTUALIZADA: Rutas públicas optimizadas
+ * - GET /recipes es público (ver recetas sin login)
+ * - POST/PUT/DELETE /recipes requiere autenticación
+ * - /users está protegido excepto POST (registro)
  */
 
 @Configuration
@@ -58,14 +61,33 @@ public class SecurityConfig {
             
             // Configurar autorizaciones
             .authorizeHttpRequests(auth -> auth
-                // Rutas públicas (sin autenticación)
-                .requestMatchers(
-                    "/api/v1/auth/**",           // Login y registro
-                    "/api/v1/users",             // Registro de usuarios (POST)
-                    "/error"                      // Manejo de errores
-                ).permitAll()
+                // === RUTAS PÚBLICAS (sin autenticación) ===
                 
-                // Todas las demás rutas requieren autenticación
+                // Autenticación
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                
+                // Registro de usuarios (POST)
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/users").permitAll()
+                
+                // Ver recetas públicas (GET)
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/recipes/**").permitAll()
+                
+                // Ver tipos de comida (GET)
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/meal-types").permitAll()
+                
+                // Ver alérgenos (GET)
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/allergens").permitAll()
+                
+                // Ver dietas (GET)
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/diets").permitAll()
+                
+                // Información nutricional pública (GET)
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/nutrition-info/**").permitAll()
+                
+                // Manejo de errores
+                .requestMatchers("/error").permitAll()
+                
+                // === TODAS LAS DEMÁS RUTAS REQUIEREN AUTENTICACIÓN ===
                 .anyRequest().authenticated()
             )
             
