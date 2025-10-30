@@ -18,11 +18,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM recipe_permissions WHERE recipe_id = :recipeId", nativeQuery = true)
-    void deleteRecipePermissionsByRecipeId(@Param("recipeId") Long recipeId);
-    
-    @Modifying
-    @Transactional
     @Query(value = "DELETE FROM group_recipes WHERE recipe_id = :recipeId", nativeQuery = true)
     void deleteGroupRecipesByRecipeId(@Param("recipeId") Long recipeId);
     

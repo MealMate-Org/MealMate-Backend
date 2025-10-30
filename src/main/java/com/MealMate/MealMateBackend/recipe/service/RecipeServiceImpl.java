@@ -85,52 +85,42 @@ public class RecipeServiceImpl implements RecipeService {
         System.out.println("✅ Receta encontrada: " + recipe.getTitle());
 
         try {
-            // 1. Limpiar relaciones ManyToMany PRIMERO
-            System.out.println("🔄 Limpiando relaciones ManyToMany...");
-            if (recipe.getAllergens() != null && !recipe.getAllergens().isEmpty()) {
-                System.out.println("   - Alérgenos a limpiar: " + recipe.getAllergens().size());
-                recipe.getAllergens().clear();
-                recipeRepository.saveAndFlush(recipe);
-            }
-
-            // 2. Eliminar referencias en ORDEN CORRECTO
+            // Eliminar referencias en otras tablas (solo las que existen)
             System.out.println("🔄 Eliminando referencias en otras tablas...");
-
-            System.out.println("   - Eliminando meal_plan_items...");
-            recipeRepository.deleteMealPlanItemsByRecipeId(id);
-
-            System.out.println("   - Eliminando recipe_permissions...");
-            recipeRepository.deleteRecipePermissionsByRecipeId(id);
-
-            System.out.println("   - Eliminando group_recipes...");
-            recipeRepository.deleteGroupRecipesByRecipeId(id);
-
-            System.out.println("   - Eliminando favorites...");
-            recipeRepository.deleteFavoritesByRecipeId(id);
-
-            System.out.println("   - Eliminando ratings...");
-            recipeRepository.deleteRatingsByRecipeId(id);
-
-            System.out.println("   - Eliminando nutrition_info...");
-            recipeRepository.deleteNutritionInfoByRecipeId(id);
 
             System.out.println("   - Eliminando recipe_allergens...");
             recipeRepository.deleteRecipeAllergensByRecipeId(id);
 
-            // 3. Flush para asegurar que todo se ejecutó
+            System.out.println("   - Eliminando nutrition_info...");
+            recipeRepository.deleteNutritionInfoByRecipeId(id);
+
+            System.out.println("   - Eliminando ratings...");
+            recipeRepository.deleteRatingsByRecipeId(id);
+
+            System.out.println("   - Eliminando favorites...");
+            recipeRepository.deleteFavoritesByRecipeId(id);
+
+            System.out.println("   - Eliminando group_recipes...");
+            recipeRepository.deleteGroupRecipesByRecipeId(id);
+
+            System.out.println("   - Eliminando meal_plan_items...");
+            recipeRepository.deleteMealPlanItemsByRecipeId(id);
+
+            // Flush para asegurar que todas las queries se ejecutaron
             recipeRepository.flush();
 
-            // 4. AHORA SÍ eliminar la receta
+            // Ahora eliminar la receta principal
             System.out.println("🗑️ Eliminando la receta principal...");
             recipeRepository.deleteById(id);
-            recipeRepository.flush();
 
             System.out.println("✅ ===== RECETA " + id + " ELIMINADA EXITOSAMENTE =====");
         } catch (Exception e) {
             System.err.println("❌ ===== ERROR ELIMINANDO RECETA " + id + " =====");
             System.err.println("Tipo de error: " + e.getClass().getName());
             System.err.println("Mensaje: " + e.getMessage());
-            System.err.println("Causa raíz: " + (e.getCause() != null ? e.getCause().getMessage() : "N/A"));
+            if (e.getCause() != null) {
+                System.err.println("Causa raíz: " + e.getCause().getMessage());
+            }
             e.printStackTrace();
             throw new RuntimeException("Error al eliminar la receta: " + e.getMessage(), e);
         }
