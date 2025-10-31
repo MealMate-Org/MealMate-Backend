@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,6 +17,9 @@ public interface RatingRepository extends JpaRepository<Rating, RatingKey> {
     
     @Query("SELECT r FROM Rating r WHERE r.id.recipeId = :recipeId AND r.id.userId = :userId")
     Optional<Rating> findByRecipeIdAndUserId(@Param("recipeId") Long recipeId, @Param("userId") Long userId);
+    
+    @Query("SELECT r FROM Rating r WHERE r.id.recipeId = :recipeId")
+    List<Rating> findByRecipeId(@Param("recipeId") Long recipeId);
     
     @Transactional
     @Modifying
