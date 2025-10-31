@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -169,12 +170,16 @@ public class RecipeServiceImpl implements RecipeService {
         recipe.setUpdatedAt(LocalDateTime.now());
         recipe.setMealTypeId(recipeDTO.getMealTypeId());
 
+        // ✅ ACTUALIZAR ALÉRGENOS CORRECTAMENTE
         if (recipeDTO.getAllergens() != null) {
             List<Integer> allergenIds = recipeDTO.getAllergens().stream()
                     .map(Allergen::getId)
                     .collect(Collectors.toList());
             List<Allergen> allergens = allergenRepository.findAllById(allergenIds);
             recipe.setAllergens(allergens);
+        } else {
+            // Si no hay alérgenos en el DTO, limpiar la lista
+            recipe.setAllergens(new ArrayList<>());
         }
 
         Recipe updatedRecipe = recipeRepository.save(recipe);
