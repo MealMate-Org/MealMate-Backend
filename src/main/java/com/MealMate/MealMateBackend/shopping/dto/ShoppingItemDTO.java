@@ -1,17 +1,16 @@
+// ShoppingItemDTO.java
 package com.MealMate.MealMateBackend.shopping.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShoppingItem {
+public class ShoppingItemDTO {
     private String name;
-    private BigDecimal quantity;
+    private Double quantity;
     private String unit;
-    private Boolean checked;
+    private Boolean checked = false;
 }

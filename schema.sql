@@ -164,16 +164,17 @@ PRIMARY KEY (group_id, recipe_id)
 
 -- === 9. SHOPPING (Lista de compra mejorada) ===
 CREATE TABLE shopping_lists (
-id BIGSERIAL PRIMARY KEY,
-user_id BIGINT NOT NULL REFERENCES users(id),
-meal_plan_id BIGINT REFERENCES meal_plans(id),
-group_id BIGINT REFERENCES groups(id),
-week_start_date DATE,
-week_end_date DATE,
-created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-updated_at TIMESTAMP,
-deleted_at TIMESTAMP,
-items JSONB NOT NULL DEFAULT '[]'::jsonb
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES users(id),
+    meal_plan_id BIGINT REFERENCES meal_plans(id),
+    group_id BIGINT REFERENCES groups(id),
+    week_start_date DATE,
+    week_end_date DATE,
+    title VARCHAR(255), -- NUEVO: Título de la lista
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- NUEVO: Campo de actualización
+    deleted_at TIMESTAMP,
+    items JSONB NOT NULL DEFAULT '[]'::jsonb
 );
 
 -- === 10. RECIPE_ALLERGENS ===
@@ -197,3 +198,43 @@ CREATE INDEX idx_meal_plan_items_recipe ON meal_plan_items(recipe_id);
 CREATE INDEX idx_shopping_lists_user ON shopping_lists(user_id);
 CREATE INDEX idx_shopping_lists_meal_plan ON shopping_lists(meal_plan_id);
 CREATE INDEX idx_shopping_lists_week ON shopping_lists(week_start_date, week_end_date);
+
+-- === TRIGGERS PARA ACTUALIZACIÓN AUTOMÁTICA ===
+-- Trigger para actualizar updated_at en shopping_lists
+CREATE OR REPLACE FUNCTION update_shopping_lists_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_shopping_lists_updated_at
+    BEFORE UPDATE ON shopping_lists
+    FOR EACH ROW
+    EXECUTE FUNCTION update_shopping_lists_updated_at();
+
+-- Trigger para actualizar el rating promedio de recetas
+CREATE OR REPLACE FUNCTION update_recipe_rating()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE recipes 
+    SET avg_rating = (
+        SELECT COALESCE(AVG(score), 0) 
+        FROM ratings 
+        WHERE recipe_id = NEW.recipe_id
+    ),
+    rating_count = (
+        SELECT COUNT(*) 
+        FROM ratings 
+        WHERE recipe_id = NEW.recipe_id
+    )
+    WHERE id = NEW.recipe_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_recipe_rating
+    AFTER INSERT OR UPDATE OR DELETE ON ratings
+    FOR EACH ROW
+    EXECUTE FUNCTION update_recipe_rating();

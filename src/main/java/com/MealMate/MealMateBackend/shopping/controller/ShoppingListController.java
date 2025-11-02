@@ -21,6 +21,11 @@ public class ShoppingListController {
         return ResponseEntity.ok(shoppingListService.getAllShoppingLists());
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ShoppingListDTO>> getShoppingListsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(shoppingListService.getShoppingListsByUserId(userId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ShoppingListDTO> getShoppingListById(@PathVariable Long id) {
         return ResponseEntity.ok(shoppingListService.getShoppingListById(id));

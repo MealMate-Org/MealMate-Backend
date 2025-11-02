@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,26 +20,34 @@ public class ShoppingList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private com.MealMate.MealMateBackend.user.model.User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meal_plan_id")
     private com.MealMate.MealMateBackend.planner.model.MealPlan mealPlan;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private com.MealMate.MealMateBackend.social.model.Group group;
+    @Column(name = "week_start_date")
+    private LocalDate weekStartDate;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private com.MealMate.MealMateBackend.user.model.User user;
+    @Column(name = "week_end_date")
+    private LocalDate weekEndDate;
+
+    private String title;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
-
-    private LocalDateTime deletedAt;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<ShoppingItem> items;
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface ShoppingListService {
     List<ShoppingListDTO> getAllShoppingLists();
+    List<ShoppingListDTO> getShoppingListsByUserId(Long userId);
     ShoppingListDTO getShoppingListById(Long id);
     ShoppingListDTO createShoppingList(ShoppingListCreateDTO shoppingListCreateDTO);
     ShoppingListDTO updateShoppingList(Long id, ShoppingListDTO shoppingListDTO);
