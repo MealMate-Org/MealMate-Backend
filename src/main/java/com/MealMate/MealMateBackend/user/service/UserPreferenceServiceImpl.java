@@ -19,9 +19,9 @@ public class UserPreferenceServiceImpl implements UserPreferenceService {
     @Autowired
     private DietRepository dietRepository;
 
-    // ✅ CONSTANTES PARA VALIDACIÓN
-    private static final int MAX_CALORIES = 999999; // 6 dígitos
-    private static final BigDecimal MAX_MACROS = new BigDecimal("9999.99"); // precision 6, scale 2
+    // CONSTANTES PARA VALIDACIÓN
+    private static final int MAX_CALORIES = 999999;
+    private static final BigDecimal MAX_MACROS = new BigDecimal("9999.99");
 
     @Override
     public UserPreferenceDTO getUserPreferenceByUserId(Long userId) {
@@ -32,11 +32,22 @@ public class UserPreferenceServiceImpl implements UserPreferenceService {
 
     @Override
     public UserPreferenceDTO createOrUpdateUserPreference(UserPreferenceDTO userPreferenceDTO) {
-        // ✅ VALIDAR VALORES ANTES DE GUARDAR
+        // Validar valores antes de guardar
         validatePreferences(userPreferenceDTO);
 
         UserPreference preference = new UserPreference();
         preference.setUserId(userPreferenceDTO.getUserId());
+        
+        // Campos de cálculo automático
+        preference.setUseAutomaticCalculation(userPreferenceDTO.getUseAutomaticCalculation());
+        preference.setGender(userPreferenceDTO.getGender());
+        preference.setAge(userPreferenceDTO.getAge());
+        preference.setWeight(userPreferenceDTO.getWeight());
+        preference.setHeight(userPreferenceDTO.getHeight());
+        preference.setActivityLevel(userPreferenceDTO.getActivityLevel());
+        preference.setGoal(userPreferenceDTO.getGoal());
+        
+        // Campos manuales
         preference.setDailyCaloriesGoal(userPreferenceDTO.getDailyCaloriesGoal());
         preference.setDailyCarbsGoal(userPreferenceDTO.getDailyCarbsGoal());
         preference.setDailyProteinGoal(userPreferenceDTO.getDailyProteinGoal());
@@ -58,38 +69,68 @@ public class UserPreferenceServiceImpl implements UserPreferenceService {
         userPreferenceRepository.deleteById(userId);
     }
 
-    // ✅ MÉTODO DE VALIDACIÓN CON MENSAJES CLAROS
+    // MÉTODO DE VALIDACIÓN CON MENSAJES CLAROS
     private void validatePreferences(UserPreferenceDTO dto) {
-        // Validar calorías
-        if (dto.getDailyCaloriesGoal() != null && dto.getDailyCaloriesGoal() > MAX_CALORIES) {
-            throw new IllegalArgumentException(
-                String.format("Las calorías diarias no pueden exceder %d. Valor ingresado: %d", 
-                    MAX_CALORIES, dto.getDailyCaloriesGoal())
-            );
-        }
+        // Si usa cálculo automático, validar campos requeridos
+        if (Boolean.TRUE.equals(dto.getUseAutomaticCalculation())) {
+            if (dto.getGender() == null || dto.getGender().isEmpty()) {
+                throw new IllegalArgumentException("El género es obligatorio para el cálculo automático");
+            }
+            if (dto.getAge() == null) {
+                throw new IllegalArgumentException("La edad es obligatoria para el cálculo automático");
+            }
+            if (dto.getWeight() == null) {
+                throw new IllegalArgumentException("El peso es obligatorio para el cálculo automático");
+            }
+            if (dto.getHeight() == null) {
+                throw new IllegalArgumentException("La altura es obligatoria para el cálculo automático");
+            }
+            if (dto.getActivityLevel() == null || dto.getActivityLevel().isEmpty()) {
+                throw new IllegalArgumentException("El nivel de actividad es obligatorio para el cálculo automático");
+            }
+            if (dto.getGoal() == null || dto.getGoal().isEmpty()) {
+                throw new IllegalArgumentException("El objetivo es obligatorio para el cálculo automático");
+            }
+            
+            // Validar rangos
+            if (dto.getAge() < 15 || dto.getAge() > 100) {
+                throw new IllegalArgumentException("La edad debe estar entre 15 y 100 años");
+            }
+            if (dto.getWeight().compareTo(new BigDecimal("30")) < 0 || dto.getWeight().compareTo(new BigDecimal("300")) > 0) {
+                throw new IllegalArgumentException("El peso debe estar entre 30 y 300 kg");
+            }
+            if (dto.getHeight().compareTo(new BigDecimal("100")) < 0 || dto.getHeight().compareTo(new BigDecimal("250")) > 0) {
+                throw new IllegalArgumentException("La altura debe estar entre 100 y 250 cm");
+            }
+        } else {
+            // Si es manual, validar límites
+            if (dto.getDailyCaloriesGoal() != null && dto.getDailyCaloriesGoal() > MAX_CALORIES) {
+                throw new IllegalArgumentException(
+                    String.format("Las calorías diarias no pueden exceder %d. Valor ingresado: %d", 
+                        MAX_CALORIES, dto.getDailyCaloriesGoal())
+                );
+            }
 
-        // Validar carbohidratos
-        if (dto.getDailyCarbsGoal() != null && dto.getDailyCarbsGoal().compareTo(MAX_MACROS) > 0) {
-            throw new IllegalArgumentException(
-                String.format("Los carbohidratos diarios no pueden exceder %.2f gramos. Valor ingresado: %.2f", 
-                    MAX_MACROS, dto.getDailyCarbsGoal())
-            );
-        }
+            if (dto.getDailyCarbsGoal() != null && dto.getDailyCarbsGoal().compareTo(MAX_MACROS) > 0) {
+                throw new IllegalArgumentException(
+                    String.format("Los carbohidratos diarios no pueden exceder %.2f gramos. Valor ingresado: %.2f", 
+                        MAX_MACROS, dto.getDailyCarbsGoal())
+                );
+            }
 
-        // Validar proteínas
-        if (dto.getDailyProteinGoal() != null && dto.getDailyProteinGoal().compareTo(MAX_MACROS) > 0) {
-            throw new IllegalArgumentException(
-                String.format("Las proteínas diarias no pueden exceder %.2f gramos. Valor ingresado: %.2f", 
-                    MAX_MACROS, dto.getDailyProteinGoal())
-            );
-        }
+            if (dto.getDailyProteinGoal() != null && dto.getDailyProteinGoal().compareTo(MAX_MACROS) > 0) {
+                throw new IllegalArgumentException(
+                    String.format("Las proteínas diarias no pueden exceder %.2f gramos. Valor ingresado: %.2f", 
+                        MAX_MACROS, dto.getDailyProteinGoal())
+                );
+            }
 
-        // Validar grasas
-        if (dto.getDailyFatGoal() != null && dto.getDailyFatGoal().compareTo(MAX_MACROS) > 0) {
-            throw new IllegalArgumentException(
-                String.format("Las grasas diarias no pueden exceder %.2f gramos. Valor ingresado: %.2f", 
-                    MAX_MACROS, dto.getDailyFatGoal())
-            );
+            if (dto.getDailyFatGoal() != null && dto.getDailyFatGoal().compareTo(MAX_MACROS) > 0) {
+                throw new IllegalArgumentException(
+                    String.format("Las grasas diarias no pueden exceder %.2f gramos. Valor ingresado: %.2f", 
+                        MAX_MACROS, dto.getDailyFatGoal())
+                );
+            }
         }
 
         // Validar valores negativos
@@ -107,15 +148,27 @@ public class UserPreferenceServiceImpl implements UserPreferenceService {
         }
     }
 
-    // ✅ CONVERTIR A DTO MANUALMENTE
+    // CONVERTIR A DTO MANUALMENTE
     private UserPreferenceDTO convertToDTO(UserPreference preference) {
         UserPreferenceDTO dto = new UserPreferenceDTO();
         dto.setUserId(preference.getUserId());
+        
+        // Campos de cálculo automático
+        dto.setUseAutomaticCalculation(preference.getUseAutomaticCalculation());
+        dto.setGender(preference.getGender());
+        dto.setAge(preference.getAge());
+        dto.setWeight(preference.getWeight());
+        dto.setHeight(preference.getHeight());
+        dto.setActivityLevel(preference.getActivityLevel());
+        dto.setGoal(preference.getGoal());
+        
+        // Campos manuales
         dto.setDailyCaloriesGoal(preference.getDailyCaloriesGoal());
         dto.setDailyCarbsGoal(preference.getDailyCarbsGoal());
         dto.setDailyProteinGoal(preference.getDailyProteinGoal());
         dto.setDailyFatGoal(preference.getDailyFatGoal());
         dto.setDietId(preference.getDiet() != null ? preference.getDiet().getId() : null);
+        
         return dto;
     }
 }

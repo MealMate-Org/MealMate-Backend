@@ -16,4 +16,5 @@ public class MealPlanDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private LocalDateTime createdAt;
+    private Boolean isActive;
 }

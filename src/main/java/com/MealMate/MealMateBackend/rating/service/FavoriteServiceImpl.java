@@ -20,7 +20,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Autowired
     private FavoriteRepository favoriteRepository;
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -32,16 +32,16 @@ public class FavoriteServiceImpl implements FavoriteService {
             String email = auth.getName();
             User currentUser = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
+
             System.out.println("🔍 Cargando favoritos del usuario: " + email + " (ID: " + currentUser.getId() + ")");
-            
+
             // ✅ FILTRAR SOLO FAVORITOS DEL USUARIO AUTENTICADO
             List<Favorite> favorites = favoriteRepository.findAll();
             List<FavoriteDTO> userFavorites = favorites.stream()
                     .filter(f -> f.getId().getUserId().equals(currentUser.getId()))
                     .map(this::mapToDTO)
                     .collect(Collectors.toList());
-            
+
             System.out.println("✅ Favoritos encontrados: " + userFavorites.size());
             return userFavorites;
         } catch (Exception e) {
@@ -53,16 +53,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public FavoriteDTO getFavoriteById(Long userId, Long recipeId) {
-        // ✅ VERIFICAR QUE EL USUARIO AUTENTICADO COINCIDA
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        User currentUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
-        if (!currentUser.getId().equals(userId)) {
-            throw new RuntimeException("No autorizado para ver este favorito");
-        }
-        
+        // Elimina la verificación de autorización, solo busca el favorito
         Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userId, recipeId)
                 .orElseThrow(() -> new RuntimeException("Favorite not found"));
         return mapToDTO(favorite);
@@ -76,14 +67,15 @@ public class FavoriteServiceImpl implements FavoriteService {
             String email = auth.getName();
             User currentUser = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
+
             Favorite favorite = new Favorite();
             FavoriteKey key = new FavoriteKey(currentUser.getId(), favoriteDTO.getRecipeId());
             favorite.setId(key);
             favorite.setCreatedAt(LocalDateTime.now());
-            
+
             Favorite savedFavorite = favoriteRepository.save(favorite);
-            System.out.println("✅ Favorito creado: Usuario " + currentUser.getId() + " -> Receta " + favoriteDTO.getRecipeId());
+            System.out.println(
+                    "✅ Favorito creado: Usuario " + currentUser.getId() + " -> Receta " + favoriteDTO.getRecipeId());
             return mapToDTO(savedFavorite);
         } catch (Exception e) {
             System.err.println("❌ Error al crear favorito: " + e.getMessage());
@@ -100,11 +92,11 @@ public class FavoriteServiceImpl implements FavoriteService {
             String email = auth.getName();
             User currentUser = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
+
             if (!currentUser.getId().equals(userId)) {
                 throw new RuntimeException("No autorizado para eliminar este favorito");
             }
-            
+
             favoriteRepository.deleteByUserIdAndRecipeId(userId, recipeId);
             System.out.println("✅ Favorito eliminado: Usuario " + userId + " -> Receta " + recipeId);
         } catch (Exception e) {

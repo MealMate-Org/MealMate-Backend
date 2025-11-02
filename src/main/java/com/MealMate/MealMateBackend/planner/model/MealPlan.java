@@ -31,10 +31,16 @@ public class MealPlan {
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+        if (isActive == null) {
+            isActive = true;
         }
     }
 }

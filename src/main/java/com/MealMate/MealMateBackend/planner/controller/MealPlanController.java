@@ -4,13 +4,16 @@ import com.MealMate.MealMateBackend.planner.dto.MealPlanDTO;
 import com.MealMate.MealMateBackend.planner.dto.MealPlanCreateDTO;
 import com.MealMate.MealMateBackend.planner.service.MealPlanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/meal-plans")
+@CrossOrigin(origins = "*")
 public class MealPlanController {
 
     @Autowired
@@ -21,9 +24,29 @@ public class MealPlanController {
         return ResponseEntity.ok(mealPlanService.getAllMealPlans());
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<MealPlanDTO>> getMealPlansByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(mealPlanService.getMealPlansByUserId(userId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<MealPlanDTO> getMealPlanById(@PathVariable Long id) {
         return ResponseEntity.ok(mealPlanService.getMealPlanById(id));
+    }
+
+    @GetMapping("/user/{userId}/active")
+    public ResponseEntity<MealPlanDTO> getActiveByUserIdAndDate(
+            @PathVariable Long userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(mealPlanService.getActiveByUserIdAndDate(userId, date));
+    }
+
+    @GetMapping("/user/{userId}/week")
+    public ResponseEntity<MealPlanDTO> getOrCreateForWeek(
+            @PathVariable Long userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate weekStart,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate weekEnd) {
+        return ResponseEntity.ok(mealPlanService.getOrCreateMealPlanForWeek(userId, weekStart, weekEnd));
     }
 
     @PostMapping
@@ -32,7 +55,9 @@ public class MealPlanController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MealPlanDTO> updateMealPlan(@PathVariable Long id, @RequestBody MealPlanDTO mealPlanDTO) {
+    public ResponseEntity<MealPlanDTO> updateMealPlan(
+            @PathVariable Long id, 
+            @RequestBody MealPlanDTO mealPlanDTO) {
         return ResponseEntity.ok(mealPlanService.updateMealPlan(id, mealPlanDTO));
     }
 

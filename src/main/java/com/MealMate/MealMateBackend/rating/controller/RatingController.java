@@ -22,7 +22,16 @@ public class RatingController {
 
     @GetMapping("/{recipeId}/{userId}")
     public ResponseEntity<RatingDTO> getRatingById(@PathVariable Long recipeId, @PathVariable Long userId) {
-        return ResponseEntity.ok(ratingService.getRatingById(recipeId, userId));
+        try {
+            RatingDTO rating = ratingService.getRatingById(recipeId, userId);
+            return ResponseEntity.ok(rating);
+        } catch (RuntimeException e) {
+            if (e.getMessage().equals("Rating not found")) {
+                return ResponseEntity.notFound().build(); // ✅ 404 cuando no existe
+            }
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PostMapping
@@ -31,7 +40,8 @@ public class RatingController {
     }
 
     @PutMapping("/{recipeId}/{userId}")
-    public ResponseEntity<RatingDTO> updateRating(@PathVariable Long recipeId, @PathVariable Long userId, @RequestBody RatingDTO ratingDTO) {
+    public ResponseEntity<RatingDTO> updateRating(@PathVariable Long recipeId, @PathVariable Long userId,
+            @RequestBody RatingDTO ratingDTO) {
         return ResponseEntity.ok(ratingService.updateRating(recipeId, userId, ratingDTO));
     }
 

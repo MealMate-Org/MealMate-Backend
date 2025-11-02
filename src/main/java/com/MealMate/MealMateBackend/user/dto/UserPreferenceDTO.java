@@ -11,9 +11,20 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class UserPreferenceDTO {
     private Long userId;
+    
+    // Objetivos manuales
     private Integer dailyCaloriesGoal;
     private BigDecimal dailyCarbsGoal;
     private BigDecimal dailyProteinGoal;
     private BigDecimal dailyFatGoal;
     private Integer dietId;
+    
+    // Campos para cálculo automático
+    private Boolean useAutomaticCalculation;
+    private String gender;
+    private Integer age;
+    private BigDecimal weight;
+    private BigDecimal height;
+    private String activityLevel;
+    private String goal;
 }
