@@ -12,8 +12,6 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white)](https://jwt.io/)
 
-[Documentación](#características-principales) • [Instalación](#-instalación-y-configuración) • [API Endpoints](#-endpoints-de-la-api) • [Testing](#-testing)
-
 </div>
 
 ---
@@ -37,8 +35,6 @@
 - [Testing](#-testing)
 - [Variables de Entorno](#-variables-de-entorno)
 - [Scripts y Comandos](#-scripts-y-comandos)
-- [Despliegue](#-despliegue)
-- [Contribución](#-contribución)
 - [Licencia](#-licencia)
 
 ---
@@ -545,7 +541,7 @@ MealMateBackend/
 
 ## 🗄️ Modelo de Datos
 
-### Diagrama Entidad-Relación (Simplificado)
+### Diagrama Entidad-Relación
 
 ```
 ┌─────────────┐       ┌──────────────┐       ┌─────────────┐
@@ -582,6 +578,155 @@ MealMateBackend/
 | **favorites** | Favoritos | (user_id, recipe_id) PK |
 | **allergens** | Alérgenos | id, name |
 | **user_allergens** | Alérgenos del usuario | user_id, allergen_id |
+
+### Diagrama de Clases
+
+# Diagrama de Clases
+```mermaid
+classDiagram
+    class User {
+        +Long id
+        +String username
+        +String email
+        +String password
+        +String avatar
+        +String bio
+        +LocalDateTime createdAt
+        +LocalDateTime updatedAt
+        +LocalDateTime deletedAt
+        +Role role
+    }
+
+    class Role {
+        +Integer id
+        +String name
+    }
+
+    class Recipe {
+        +Long id
+        +String title
+        +String description
+        +String instructions
+        +String imagePath
+        +User author
+        +Boolean isPublic
+        +LocalDateTime createdAt
+        +LocalDateTime updatedAt
+        +LocalDateTime deletedAt
+        +BigDecimal avgRating
+        +Integer ratingCount
+        +List~IngredientItem~ ingredients
+        +List~Allergen~ allergens
+        +Integer mealTypeId
+    }
+
+    class NutritionInfo {
+        +Long recipeId
+        +BigDecimal calories
+        +BigDecimal protein
+        +BigDecimal carbs
+        +BigDecimal fat
+        +BigDecimal portionSize
+    }
+
+    class Allergen {
+        +Integer id
+        +String name
+    }
+
+    class MealPlan {
+        +Long id
+        +User user
+        +LocalDate startDate
+        +LocalDate endDate
+        +LocalDateTime createdAt
+        +Boolean isActive
+    }
+
+    class MealPlanItem {
+        +Long id
+        +MealPlan mealPlan
+        +Recipe recipe
+        +MealType mealType
+        +LocalDate date
+    }
+
+    class MealType {
+        +Integer id
+        +String name
+    }
+
+    class ShoppingList {
+        +Long id
+        +User user
+        +MealPlan mealPlan
+        +LocalDate weekStartDate
+        +LocalDate weekEndDate
+        +String title
+        +LocalDateTime createdAt
+        +LocalDateTime updatedAt
+        +List~ShoppingItem~ items
+    }
+
+    class Rating {
+        +RatingKey id
+        +Integer score
+    }
+
+    class Favorite {
+        +FavoriteKey id
+        +LocalDateTime createdAt
+    }
+
+    class UserPreference {
+        +Long userId
+        +Integer dailyCaloriesGoal
+        +BigDecimal dailyCarbsGoal
+        +BigDecimal dailyProteinGoal
+        +BigDecimal dailyFatGoal
+        +Diet diet
+        +Boolean useAutomaticCalculation
+        +String gender
+        +Integer age
+        +BigDecimal weight
+        +BigDecimal height
+        +String activityLevel
+        +String goal
+    }
+
+    class Diet {
+        +Integer id
+        +String name
+    }
+
+    class RecipePermission {
+        +Long id
+        +Recipe recipe
+        +User user
+    }
+
+    User "1" --> "1" Role
+    User "1" --> "*" Recipe : author
+    User "1" --> "*" MealPlan
+    User "1" --> "*" ShoppingList
+    User "1" --> "0..1" UserPreference
+    User "*" --> "*" Allergen
+    User "*" --> "*" Recipe : favorites
+    User "*" --> "*" Recipe : ratings
+
+    Recipe "1" --> "0..1" NutritionInfo
+    Recipe "*" --> "*" Allergen
+    Recipe "1" --> "*" RecipePermission
+    Recipe "*" --> "*" User : permissions
+
+    MealPlan "1" --> "*" MealPlanItem
+    MealPlan "0..1" --> "*" ShoppingList
+
+    MealPlanItem "*" --> "1" Recipe
+    MealPlanItem "*" --> "1" MealType
+
+    UserPreference "*" --> "1" Diet
+```
 
 ### Tipos de Datos Especiales
 
@@ -863,15 +1008,10 @@ El reporte HTML se genera en: `target/site/jacoco/index.html`
 
 ### Estadísticas de Testing
 
-| Módulo | Tests | Cobertura |
-|--------|-------|-----------|
-| **Nutrition** | 12 tests | ~90% |
-| **Planner** | 28 tests | ~85% |
-| **Rating** | 16 tests | ~88% |
-| **Recipe** | 24 tests | ~87% |
-| **Shopping** | 14 tests | ~86% |
-| **User** | 18 tests | ~89% |
-| **Total** | **112+ tests** | **~87%** |
+<div align="center">
+  <img width="297" height="320" alt="image" src="https://github.com/user-attachments/assets/cff61ccb-6559-4fc2-b8e0-6c04cd992b95" />
+</div>
+
 
 ### Tecnologías de Testing
 
@@ -1042,120 +1182,6 @@ SELECT * FROM users;
 
 ---
 
-## 🚢 Despliegue
-
-### Opción 1: Heroku
-
-**Requisitos:**
-- Cuenta de Heroku
-- Heroku CLI instalado
-
-```bash
-# Login
-heroku login
-
-# Crear app
-heroku create mealmate-backend
-
-# Añadir PostgreSQL
-heroku addons:create heroku-postgresql:hobby-dev
-
-# Deploy
-git push heroku main
-
-# Ver logs
-heroku logs --tail
-```
-
-**Configuración de variables:**
-```bash
-heroku config:set JAVA_OPTS="-Xmx512m"
-heroku config:set SPRING_PROFILES_ACTIVE=prod
-```
-
-### Opción 2: Railway
-
-1. Conecta tu repositorio GitHub en [railway.app](https://railway.app)
-2. Añade una base de datos PostgreSQL
-3. Configura las variables de entorno automáticamente
-4. Deploy con un clic
-
-### Opción 3: Docker (Producción)
-
-**Dockerfile:**
-```dockerfile
-FROM maven:3.9-eclipse-temurin-21 AS build
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-FROM eclipse-temurin:21-jre-alpine
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
-**Build y Run:**
-```bash
-# Build image
-docker build -t mealmate-backend .
-
-# Run container
-docker run -p 8080:8080 \
-  -e DATABASE_URL=jdbc:postgresql://host:5432/mealmate \
-  -e DATABASE_USER=postgres \
-  -e DATABASE_PASSWORD=password \
-  mealmate-backend
-```
-
-### Opción 4: AWS EC2
-
-1. Lanza una instancia EC2 (Ubuntu 22.04)
-2. Instala Java 21 y PostgreSQL
-3. Copia el JAR al servidor
-4. Ejecuta con `nohup` o crea un servicio `systemd`
-
-```bash
-# Crear servicio systemd
-sudo nano /etc/systemd/system/mealmate.service
-
-[Unit]
-Description=MealMate Backend
-After=network.target
-
-[Service]
-User=ubuntu
-WorkingDirectory=/home/ubuntu/mealmate
-ExecStart=/usr/bin/java -jar MealMateBackend-0.0.1-SNAPSHOT.jar
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-
-# Iniciar servicio
-sudo systemctl enable mealmate
-sudo systemctl start mealmate
-```
-
-### Checklist de Producción
-
-```
-✅ Cambiar credenciales de base de datos
-✅ Configurar HTTPS/SSL
-✅ Establecer SPRING_PROFILES_ACTIVE=prod
-✅ Deshabilitar actualizaciones automáticas de esquema (ddl-auto=none)
-✅ Configurar logging apropiado
-✅ Añadir health checks
-✅ Configurar backups de BD
-✅ Establecer límites de rate limiting
-✅ Configurar CORS para dominio de producción
-✅ Cambiar SECRET_KEY del JWT
-```
-
----
-
 ## 🔧 Solución de Problemas
 
 ### Error: "Port 8080 is already in use"
@@ -1208,93 +1234,6 @@ Asegúrate de que:
 
 ---
 
-## 🤝 Contribución
-
-¡Las contribuciones son bienvenidas! Sigue estos pasos:
-
-### 1. Fork del Proyecto
-
-Haz clic en "Fork" en la parte superior del repositorio.
-
-### 2. Clonar tu Fork
-
-```bash
-git clone https://github.com/tu-usuario/MealMate-Backend.git
-cd MealMate-Backend
-```
-
-### 3. Crear una Rama
-
-```bash
-git checkout -b feature/nueva-funcionalidad
-```
-
-### 4. Realizar Cambios
-
-- Escribe código limpio y bien documentado
-- Añade tests para nueva funcionalidad
-- Sigue las convenciones de Spring Boot
-- Usa Javadoc para métodos públicos
-
-### 5. Ejecutar Tests
-
-```bash
-mvn clean test
-```
-
-Asegúrate de que todos los tests pasen.
-
-### 6. Commit
-
-```bash
-git add .
-git commit -m "feat: añadir endpoint de estadísticas nutricionales"
-```
-
-Usa [Conventional Commits](https://www.conventionalcommits.org/):
-- `feat:` Nueva funcionalidad
-- `fix:` Corrección de bugs
-- `docs:` Documentación
-- `refactor:` Refactorización
-- `test:` Tests
-- `chore:` Mantenimiento
-
-### 7. Push
-
-```bash
-git push origin feature/nueva-funcionalidad
-```
-
-### 8. Pull Request
-
-Abre un Pull Request en GitHub describiendo:
-- ✅ Qué cambios realizaste
-- ✅ Por qué son necesarios
-- ✅ Cómo probar los cambios
-- ✅ Screenshots (si aplica)
-
----
-
-## 📝 Roadmap
-
-### En Desarrollo
-
-- [ ] Integración de Swagger/OpenAPI para documentación automática
-- [ ] Websockets para actualización en tiempo real
-- [ ] Sistema de notificaciones por email
-- [ ] Exportación de planes a PDF
-- [ ] API de terceros para información nutricional automática
-
-### Futuro
-
-- [ ] Soporte multiidioma (i18n)
-- [ ] Integración con aplicaciones de fitness
-- [ ] Machine Learning para recomendaciones personalizadas
-- [ ] Modo offline con sincronización
-- [ ] Aplicación móvil nativa
-
----
-
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
@@ -1331,22 +1270,8 @@ SOFTWARE.
 
 ---
 
-## 📞 Contacto y Soporte
-
-¿Tienes preguntas o sugerencias? ¡Contáctanos!
-
-- 📧 Email: [miguel.ba.caballero@gmail.com](mailto:miguel.ba.caballero@gmail.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/MealMate-Org/MealMate-Backend/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/MealMate-Org/MealMate-Backend/discussions)
-
----
-
 <div align="center">
 
 **⭐ Si te gusta este proyecto, dale una estrella en GitHub ⭐**
-
-**🍽️ ¡Happy Coding y Buen Provecho! 🍽️**
-
-[⬆ Volver arriba](#️-mealmate-backend---api-rest-con-spring-boot)
 
 </div>
