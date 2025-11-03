@@ -12,15 +12,9 @@ import java.util.Optional;
 
 @Repository
 public interface MealPlanRepository extends JpaRepository<MealPlan, Long> {
-    
-    /**
-     * Encuentra todos los planes de un usuario
-     */
+
     List<MealPlan> findByUserId(Long userId);
-    
-    /**
-     * Encuentra el plan activo de un usuario para una fecha específica
-     */
+
     @Query("SELECT mp FROM MealPlan mp WHERE mp.user.id = :userId " +
            "AND :date BETWEEN mp.startDate AND mp.endDate " +
            "AND mp.isActive = true")
@@ -28,10 +22,7 @@ public interface MealPlanRepository extends JpaRepository<MealPlan, Long> {
         @Param("userId") Long userId, 
         @Param("date") LocalDate date
     );
-    
-    /**
-     * Encuentra el plan de un usuario que contiene un rango de fechas
-     */
+
     @Query("SELECT mp FROM MealPlan mp WHERE mp.user.id = :userId " +
            "AND mp.startDate <= :endDate AND mp.endDate >= :startDate " +
            "AND mp.isActive = true")
@@ -40,10 +31,7 @@ public interface MealPlanRepository extends JpaRepository<MealPlan, Long> {
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );
-    
-    /**
-     * Encuentra planes por usuario y rango de fechas
-     */
+
     List<MealPlan> findByUserIdAndStartDateBetween(
         Long userId, 
         LocalDate startDate, 

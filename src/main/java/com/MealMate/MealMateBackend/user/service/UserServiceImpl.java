@@ -52,15 +52,12 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ✅ ACTUALIZAR CAMPOS MANUALMENTE (sin ModelMapper)
-        // Esto evita el error "Identifier was altered from X to null"
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setAvatar(userDTO.getAvatar());
         user.setBio(userDTO.getBio());
         user.setUpdatedAt(LocalDateTime.now());
 
-        // Actualizar rol si cambió
         if (userDTO.getRoleId() != null && !user.getRole().getId().equals(userDTO.getRoleId())) {
             Role role = roleRepository.findById(userDTO.getRoleId())
                     .orElseThrow(() -> new RuntimeException("Role not found"));
@@ -76,7 +73,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    // ✅ Método helper para convertir a DTO sin perder el ID
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());

@@ -61,7 +61,6 @@ public class MealPlanServiceImpl implements MealPlanService {
         User user = userRepository.findById(mealPlanCreateDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Verificar si ya existe un plan para este rango de fechas
         var existingPlan = mealPlanRepository.findByUserIdAndDateRange(
             mealPlanCreateDTO.getUserId(),
             mealPlanCreateDTO.getStartDate(),
@@ -69,7 +68,6 @@ public class MealPlanServiceImpl implements MealPlanService {
         );
 
         if (existingPlan.isPresent()) {
-            // Retornar el plan existente en lugar de crear uno nuevo
             return modelMapper.map(existingPlan.get(), MealPlanDTO.class);
         }
 

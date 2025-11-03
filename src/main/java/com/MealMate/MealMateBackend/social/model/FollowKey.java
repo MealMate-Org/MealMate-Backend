@@ -21,7 +21,6 @@ public class FollowKey implements Serializable {
     @Column(name = "follower_id")
     private Long followerId;
 
-    // ✅ CORREGIDO: En schema.sql es "followed_id", no "following_id"
     @Column(name = "followed_id")
     private Long followedId;
 }

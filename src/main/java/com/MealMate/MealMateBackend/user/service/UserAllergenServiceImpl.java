@@ -44,10 +44,8 @@ public class UserAllergenServiceImpl implements UserAllergenService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Eliminar alérgenos existentes
         userAllergenRepository.deleteByUserId(userId);
 
-        // Añadir nuevos alérgenos
         if (allergenIds != null && !allergenIds.isEmpty()) {
             List<Allergen> allergens = allergenRepository.findAllById(allergenIds);
             List<UserAllergen> userAllergens = allergens.stream()

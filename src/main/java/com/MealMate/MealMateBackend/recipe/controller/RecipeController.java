@@ -30,7 +30,6 @@ public class RecipeController {
             @RequestParam(required = false) Long authorId) {
         
         if (authorId != null) {
-            // Obtener usuario autenticado
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             User currentUser = null;
             
@@ -39,15 +38,12 @@ public class RecipeController {
                 currentUser = userRepository.findByEmail(email).orElse(null);
             }
             
-            // Obtener recetas del autor
             List<RecipeDTO> authorRecipes = recipeService.getRecipesByAuthor(authorId);
             
-            // Si el usuario autenticado es el autor, devolver TODAS sus recetas (públicas y privadas)
             if (currentUser != null && currentUser.getId().equals(authorId)) {
                 System.out.println("✅ Usuario " + currentUser.getId() + " solicitando SUS propias recetas");
                 return ResponseEntity.ok(authorRecipes);
             } else {
-                // Si es otro usuario o no autenticado, devolver solo las públicas
                 System.out.println("⚠️ Usuario diferente o no autenticado solicitando recetas de " + authorId);
                 List<RecipeDTO> publicRecipes = authorRecipes.stream()
                         .filter(RecipeDTO::getIsPublic)
@@ -55,10 +51,8 @@ public class RecipeController {
                 return ResponseEntity.ok(publicRecipes);
             }
         } else if (isPublic != null && !isPublic) {
-            // Si explícitamente se pide isPublic=false, devolver todas (requiere permisos admin)
             return ResponseEntity.ok(recipeService.getAllRecipes());
         } else {
-            // Por defecto: solo recetas públicas (SECURE BY DEFAULT)
             return ResponseEntity.ok(recipeService.getPublicRecipes());
         }
     }
@@ -67,7 +61,6 @@ public class RecipeController {
     public ResponseEntity<RecipeDTO> getRecipeById(@PathVariable Long id) {
         RecipeDTO recipe = recipeService.getRecipeById(id);
         
-        // Si la receta es privada, verificar que el usuario sea el autor
         if (!recipe.getIsPublic()) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             

@@ -13,15 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- * ============================================
- * SERVICIO DE DETALLES DE USUARIO
- * ============================================
- * 
- * Implementa UserDetailsService de Spring Security
- * Carga usuarios desde la base de datos para autenticación
- */
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -59,12 +50,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return userDetails;
     }
 
-    /**
-     * Obtiene los roles/autoridades del usuario
-     */
     private Collection<? extends GrantedAuthority> getAuthorities(User user) {
-        // Por ahora, solo usamos el rol del usuario
-        // Formato: ROLE_ADMIN, ROLE_USER, etc.
         String roleName = "ROLE_" + user.getRole().getName();
         System.out.println("🔐 Rol asignado: " + roleName);
         return Collections.singletonList(new SimpleGrantedAuthority(roleName));

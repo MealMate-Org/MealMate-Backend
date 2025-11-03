@@ -16,7 +16,6 @@ package com.MealMate.MealMateBackend.user.model;
        @Id
        private Long userId;
 
-       // Objetivos manuales
        @Column(name = "daily_calories_goal")
        private Integer dailyCaloriesGoal;
 
@@ -33,7 +32,6 @@ package com.MealMate.MealMateBackend.user.model;
        @JoinColumn(name = "diet_id")
        private Diet diet;
 
-       // Campos para cálculo automático
        @Column(name = "use_automatic_calculation")
        private Boolean useAutomaticCalculation;
 

@@ -1,4 +1,3 @@
-// ShoppingItemDTO.java
 package com.MealMate.MealMateBackend.shopping.dto;
 
 import lombok.AllArgsConstructor;

@@ -45,18 +45,15 @@ public class RatingServiceImpl implements RatingService {
                          ", userId=" + ratingDTO.getUserId() + 
                          ", score=" + ratingDTO.getScore());
         
-        // Verificar si ya existe un rating
         Rating rating = ratingRepository.findByRecipeIdAndUserId(
             ratingDTO.getRecipeId(), 
             ratingDTO.getUserId()
         ).orElse(null);
         
         if (rating != null) {
-            // Si ya existe, actualizamos
             System.out.println("⚠️ Rating ya existe, actualizando...");
             rating.setScore(ratingDTO.getScore());
         } else {
-            // Si no existe, creamos nuevo
             rating = new Rating();
             RatingKey key = new RatingKey(ratingDTO.getRecipeId(), ratingDTO.getUserId());
             rating.setId(key);
@@ -65,7 +62,6 @@ public class RatingServiceImpl implements RatingService {
         
         Rating savedRating = ratingRepository.save(rating);
         
-        // Actualizar avgRating y ratingCount de la receta
         updateRecipeRatings(ratingDTO.getRecipeId());
         
         return mapToDTO(savedRating);
@@ -84,7 +80,6 @@ public class RatingServiceImpl implements RatingService {
         rating.setScore(ratingDTO.getScore());
         Rating updatedRating = ratingRepository.save(rating);
         
-        // Actualizar avgRating y ratingCount de la receta
         updateRecipeRatings(recipeId);
         
         return mapToDTO(updatedRating);
@@ -97,27 +92,21 @@ public class RatingServiceImpl implements RatingService {
         
         ratingRepository.deleteByRecipeIdAndUserId(recipeId, userId);
         
-        // Actualizar avgRating y ratingCount de la receta
         updateRecipeRatings(recipeId);
     }
 
-    /**
-     * Recalcula y actualiza el avgRating y ratingCount de una receta
-     */
     private void updateRecipeRatings(Long recipeId) {
         System.out.println("🔄 Recalculando ratings para receta " + recipeId);
         
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
         
-        // Obtener todos los ratings de esta receta usando consulta optimizada
         List<Rating> ratings = ratingRepository.findByRecipeId(recipeId);
         
         int ratingCount = ratings.size();
         BigDecimal avgRating;
         
         if (ratingCount > 0) {
-            // Calcular promedio
             double sum = ratings.stream()
                     .mapToInt(Rating::getScore)
                     .sum();
@@ -128,7 +117,6 @@ public class RatingServiceImpl implements RatingService {
             avgRating = BigDecimal.ZERO;
         }
         
-        // Actualizar receta
         recipe.setRatingCount(ratingCount);
         recipe.setAvgRating(avgRating);
         recipeRepository.save(recipe);
@@ -137,7 +125,6 @@ public class RatingServiceImpl implements RatingService {
                          ", ratingCount=" + ratingCount);
     }
 
-    // Método auxiliar para mapear manualmente
     private RatingDTO mapToDTO(Rating rating) {
         RatingDTO dto = new RatingDTO();
         dto.setRecipeId(rating.getId().getRecipeId());

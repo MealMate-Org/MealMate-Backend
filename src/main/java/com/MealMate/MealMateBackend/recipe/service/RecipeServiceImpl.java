@@ -70,7 +70,6 @@ public class RecipeServiceImpl implements RecipeService {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
-        // ✅ VERIFICAR QUE EL USUARIO AUTENTICADO SEA EL AUTOR
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         User currentUser = userRepository.findByEmail(email)
@@ -86,7 +85,6 @@ public class RecipeServiceImpl implements RecipeService {
         System.out.println("✅ Receta encontrada: " + recipe.getTitle());
 
         try {
-            // Eliminar referencias en otras tablas (solo las que existen)
             System.out.println("🔄 Eliminando referencias en otras tablas...");
 
             System.out.println("   - Eliminando recipe_allergens...");
@@ -107,10 +105,8 @@ public class RecipeServiceImpl implements RecipeService {
             System.out.println("   - Eliminando meal_plan_items...");
             recipeRepository.deleteMealPlanItemsByRecipeId(id);
 
-            // Flush para asegurar que todas las queries se ejecutaron
             recipeRepository.flush();
 
-            // Ahora eliminar la receta principal
             System.out.println("🗑️ Eliminando la receta principal...");
             recipeRepository.deleteById(id);
 
@@ -170,7 +166,6 @@ public class RecipeServiceImpl implements RecipeService {
         recipe.setUpdatedAt(LocalDateTime.now());
         recipe.setMealTypeId(recipeDTO.getMealTypeId());
 
-        // ✅ ACTUALIZAR ALÉRGENOS CORRECTAMENTE
         if (recipeDTO.getAllergens() != null) {
             List<Integer> allergenIds = recipeDTO.getAllergens().stream()
                     .map(Allergen::getId)
@@ -178,19 +173,13 @@ public class RecipeServiceImpl implements RecipeService {
             List<Allergen> allergens = allergenRepository.findAllById(allergenIds);
             recipe.setAllergens(allergens);
         } else {
-            // Si no hay alérgenos en el DTO, limpiar la lista
             recipe.setAllergens(new ArrayList<>());
         }
 
         Recipe updatedRecipe = recipeRepository.save(recipe);
         return convertToDTO(updatedRecipe);
     }
-
-    // ===========================
-    // MÉTODOS DE CONVERSIÓN
-    // ===========================
-
-    private RecipeDTO convertToDTO(Recipe recipe) {
+ RecipeDTO convertToDTO(Recipe recipe) {
         RecipeDTO dto = new RecipeDTO();
         dto.setId(recipe.getId());
         dto.setTitle(recipe.getTitle());

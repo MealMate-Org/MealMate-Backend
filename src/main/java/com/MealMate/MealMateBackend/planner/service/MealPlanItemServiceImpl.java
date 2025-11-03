@@ -84,7 +84,6 @@ public class MealPlanItemServiceImpl implements MealPlanItemService {
         MealType mealType = mealTypeRepository.findById(createDTO.getMealTypeId())
                 .orElseThrow(() -> new RuntimeException("MealType not found"));
 
-        // Verificar si ya existe un item para esta combinación
         var existing = mealPlanItemRepository.findByMealPlanIdAndDateAndMealTypeId(
             createDTO.getMealPlanId(),
             createDTO.getDate(),
@@ -92,7 +91,6 @@ public class MealPlanItemServiceImpl implements MealPlanItemService {
         );
 
         if (existing.isPresent()) {
-            // Actualizar el existente
             MealPlanItem item = existing.get();
             item.setRecipe(recipe);
             MealPlanItem updated = mealPlanItemRepository.save(item);

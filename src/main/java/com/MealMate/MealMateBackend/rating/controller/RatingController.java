@@ -27,7 +27,7 @@ public class RatingController {
             return ResponseEntity.ok(rating);
         } catch (RuntimeException e) {
             if (e.getMessage().equals("Rating not found")) {
-                return ResponseEntity.notFound().build(); // ✅ 404 cuando no existe
+                return ResponseEntity.notFound().build();
             }
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

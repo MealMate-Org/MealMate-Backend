@@ -14,23 +14,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * ============================================
- * MANEJADOR GLOBAL DE EXCEPCIONES
- * ============================================
- * 
- * Captura y maneja excepciones relacionadas con:
- * - Autenticación
- * - Tokens JWT
- * - Credenciales
- */
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Maneja errores de credenciales inválidas
-     */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -42,9 +28,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    /**
-     * Maneja errores de usuario no encontrado
-     */
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleUserNotFound(UsernameNotFoundException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -56,9 +39,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    /**
-     * Maneja errores de token JWT expirado
-     */
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<Map<String, Object>> handleExpiredJwt(ExpiredJwtException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -70,9 +50,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    /**
-     * Maneja errores de token JWT mal formado
-     */
     @ExceptionHandler(MalformedJwtException.class)
     public ResponseEntity<Map<String, Object>> handleMalformedJwt(MalformedJwtException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -84,9 +61,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Maneja errores de firma de token JWT inválida
-     */
     @ExceptionHandler(SignatureException.class)
     public ResponseEntity<Map<String, Object>> handleSignatureException(SignatureException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -98,9 +72,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    /**
-     * Maneja cualquier otra excepción no capturada
-     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGlobalException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
@@ -109,7 +80,6 @@ public class GlobalExceptionHandler {
         response.put("error", "Internal Server Error");
         response.put("message", ex.getMessage() != null ? ex.getMessage() : "Error interno del servidor");
         
-        // Log del error para debugging
         System.err.println("❌ Error no manejado: " + ex.getClass().getName());
         System.err.println("Mensaje: " + ex.getMessage());
         ex.printStackTrace();

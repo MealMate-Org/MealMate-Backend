@@ -27,7 +27,6 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Override
     public List<FavoriteDTO> getAllFavorites() {
         try {
-            // ✅ OBTENER USUARIO AUTENTICADO
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String email = auth.getName();
             User currentUser = userRepository.findByEmail(email)
@@ -35,7 +34,6 @@ public class FavoriteServiceImpl implements FavoriteService {
 
             System.out.println("🔍 Cargando favoritos del usuario: " + email + " (ID: " + currentUser.getId() + ")");
 
-            // ✅ FILTRAR SOLO FAVORITOS DEL USUARIO AUTENTICADO
             List<Favorite> favorites = favoriteRepository.findAll();
             List<FavoriteDTO> userFavorites = favorites.stream()
                     .filter(f -> f.getId().getUserId().equals(currentUser.getId()))
@@ -53,7 +51,6 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public FavoriteDTO getFavoriteById(Long userId, Long recipeId) {
-        // Elimina la verificación de autorización, solo busca el favorito
         Favorite favorite = favoriteRepository.findByUserIdAndRecipeId(userId, recipeId)
                 .orElseThrow(() -> new RuntimeException("Favorite not found"));
         return mapToDTO(favorite);
@@ -62,7 +59,6 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Override
     public FavoriteDTO createFavorite(FavoriteDTO favoriteDTO) {
         try {
-            // ✅ USAR EL ID DEL USUARIO AUTENTICADO (no confiar en el DTO)
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String email = auth.getName();
             User currentUser = userRepository.findByEmail(email)
@@ -87,7 +83,6 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Override
     public void deleteFavorite(Long userId, Long recipeId) {
         try {
-            // ✅ VERIFICAR QUE EL USUARIO AUTENTICADO COINCIDA
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String email = auth.getName();
             User currentUser = userRepository.findByEmail(email)

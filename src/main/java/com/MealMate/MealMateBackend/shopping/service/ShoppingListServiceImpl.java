@@ -58,7 +58,6 @@ public class ShoppingListServiceImpl implements ShoppingListService {
         ShoppingList existingShoppingList = shoppingListRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("ShoppingList not found with id: " + id));
 
-        // Actualizar campos - CONVERSIÓN EXPLÍCITA DE LOS ITEMS
         existingShoppingList.setItems(convertShoppingItems(shoppingListDTO.getItems()));
         existingShoppingList.setTitle(shoppingListDTO.getTitle());
         existingShoppingList.setUpdatedAt(LocalDateTime.now());
@@ -78,7 +77,6 @@ public class ShoppingListServiceImpl implements ShoppingListService {
     private ShoppingListDTO convertToDTO(ShoppingList shoppingList) {
         ShoppingListDTO dto = modelMapper.map(shoppingList, ShoppingListDTO.class);
 
-        // Mapeo manual para asegurar la compatibilidad
         if (shoppingList.getUser() != null) {
             dto.setUserId(shoppingList.getUser().getId());
         }
@@ -96,7 +94,6 @@ public class ShoppingListServiceImpl implements ShoppingListService {
         entity.setWeekEndDate(dto.getWeekEndDate());
         entity.setItems(convertShoppingItems(dto.getItems()));
 
-        // Crear objetos mínimos para las relaciones
         if (dto.getUserId() != null) {
             com.MealMate.MealMateBackend.user.model.User user = new com.MealMate.MealMateBackend.user.model.User();
             user.setId(dto.getUserId());
