@@ -6,11 +6,11 @@ INSERT INTO roles (name) VALUES
 -- === 2. USUARIOS (con contraseñas bcrypt) ===
 -- Contraseña: "password" (hash bcrypt)
 INSERT INTO users (username, email, password, avatar, bio, role_id) VALUES
-('admin', 'admin@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '', 'Administrador del sistema', 1),
-('usuario1', 'usuario1@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '', 'Usuario de prueba', 2),
-('usuario2', 'usuario2@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '', 'Amante de la cocina saludable', 2),
-('usuario3', 'usuario3@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '', 'Chef aficionado', 2),
-('usuario4', 'usuario4@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '', 'Fan de la comida mediterránea', 2);
+('admin', 'admin@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'https://i.ibb.co/WpVZHpbW/pexels-olly-3824771-min.jpg', 'Administrador del sistema', 1),
+('usuario1', 'usuario1@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'https://i.ibb.co/SwzPpwx1/pexels-miquel-ferran-gomez-figueroa-2172703-3814446.jpg', 'Usuario de prueba', 2),
+('usuario2', 'usuario2@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'https://i.ibb.co/SwzPpwx1/pexels-miquel-ferran-gomez-figueroa-2172703-3814446.jpg', 'Amante de la cocina saludable', 2),
+('usuario3', 'usuario3@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'https://i.ibb.co/SwzPpwx1/pexels-miquel-ferran-gomez-figueroa-2172703-3814446.jpg', 'Chef aficionado', 2),
+('usuario4', 'usuario4@mealmate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'https://i.ibb.co/SwzPpwx1/pexels-miquel-ferran-gomez-figueroa-2172703-3814446.jpg', 'Fan de la comida mediterránea', 2);
 
 -- === 3. ALÉRGENOS (CATÁLOGO) ===
 INSERT INTO allergens (name) VALUES
@@ -49,7 +49,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 3. Añadir aceitunas y queso feta
 4. Aliñar con aceite de oliva y vinagre
 5. Servir fresco',
-    'https://images.pexels.com/photos/8963467/pexels-photo-8963467.jpeg',
+    'https://i.ibb.co/j9B8f9Yc/pexels-chanwalrus-1059905-1.jpg',
     1,
     true,
     '[{"name": "lechuga", "quantity": 200.0, "unit": "g"}, {"name": "tomate", "quantity": 2.0, "unit": "unidades"}, {"name": "pepino", "quantity": 1.0, "unit": "unidad"}, {"name": "cebolla", "quantity": 0.5, "unit": "unidad"}, {"name": "aceitunas", "quantity": 50.0, "unit": "g"}, {"name": "queso feta", "quantity": 100.0, "unit": "g"}, {"name": "aceite de oliva", "quantity": 2.0, "unit": "cucharadas"}, {"name": "vinagre", "quantity": 1.0, "unit": "cucharada"}]',
@@ -63,7 +63,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 3. Calentar la plancha
 4. Cocinar 5 minutos por cada lado
 5. Dejar reposar antes de servir',
-    'https://images.pexels.com/photos/262945/pexels-photo-262945.jpeg',
+    'https://i.ibb.co/93z06FH1/pexels-pixabay-262945.jpg',
     1,
     true,
     '[{"name": "pechuga de pollo", "quantity": 2.0, "unit": "unidades"}, {"name": "sal", "quantity": 1.0, "unit": "pizca"}, {"name": "pimienta", "quantity": 1.0, "unit": "pizca"}, {"name": "romero", "quantity": 1.0, "unit": "cucharadita"}, {"name": "tomillo", "quantity": 1.0, "unit": "cucharadita"}, {"name": "aceite de oliva", "quantity": 1.0, "unit": "cucharada"}]',
@@ -77,7 +77,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 3. Mezclar la avena cocida con las frutas
 4. Añadir miel o endulzante al gusto
 5. Servir caliente o frío',
-    'https://images.pexels.com/photos/128865/pexels-photo-128865.jpeg',
+    'https://i.ibb.co/7ttxBzrr/pexels-jeshoots-216951-1.jpg',
     1,
     true,
     '[{"name": "avena", "quantity": 100.0, "unit": "g"}, {"name": "leche", "quantity": 250.0, "unit": "ml"}, {"name": "plátano", "quantity": 1.0, "unit": "unidad"}, {"name": "fresas", "quantity": 100.0, "unit": "g"}, {"name": "miel", "quantity": 1.0, "unit": "cucharada"}, {"name": "nueces", "quantity": 30.0, "unit": "g"}]',
@@ -91,7 +91,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 3. Añadir caldo de verduras
 4. Cocinar a fuego lento 25 minutos
 5. Servir caliente con perejil fresco',
-    'https://images.pexels.com/photos/19063283/pexels-photo-19063283.jpeg',
+    'https://i.ibb.co/8Lkh0ks5/pexels-ana-zarrouq-5767338-19063283.jpg',
     1,
     true,
     '[{"name": "zanahoria", "quantity": 2.0, "unit": "unidades"}, {"name": "apio", "quantity": 2.0, "unit": "tallos"}, {"name": "cebolla", "quantity": 1.0, "unit": "unidad"}, {"name": "puerro", "quantity": 1.0, "unit": "unidad"}, {"name": "calabacín", "quantity": 1.0, "unit": "unidad"}, {"name": "caldo de verduras", "quantity": 1.0, "unit": "litro"}, {"name": "perejil", "quantity": 1.0, "unit": "pizca"}]',
@@ -105,7 +105,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 3. Añadir agua hasta conseguir textura deseada
 4. Rectificar de sal
 5. Servir con aceite de oliva y pimentón',
-    'https://images.pexels.com/photos/1618898/pexels-photo-1618898.jpeg',
+    'https://i.ibb.co/hx2zpXsT/pexels-naimbic-1618898.jpg',
     1,
     true,
     '[{"name": "garbanzos", "quantity": 400.0, "unit": "g"}, {"name": "tahini", "quantity": 2.0, "unit": "cucharadas"}, {"name": "ajo", "quantity": 1.0, "unit": "diente"}, {"name": "limón", "quantity": 1.0, "unit": "unidad"}, {"name": "comino", "quantity": 1.0, "unit": "cucharadita"}, {"name": "aceite de oliva", "quantity": 3.0, "unit": "cucharadas"}, {"name": "pimentón", "quantity": 1.0, "unit": "pizca"}]',
@@ -120,7 +120,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 4. Batir los huevos y mezclar con las patatas
 5. Cuajar la tortilla en sartén por ambos lados
 6. Servir caliente o fría',
-    'https://images.pexels.com/photos/14941246/pexels-photo-14941246.jpeg',
+    'https://i.ibb.co/mFGTrQbK/pexels-mikegz-400576129-14941246.jpg',
     2,
     true,
     '[{"name": "patatas", "quantity": 4.0, "unit": "unidades"}, {"name": "huevos", "quantity": 6.0, "unit": "unidades"}, {"name": "cebolla", "quantity": 1.0, "unit": "unidad"}, {"name": "aceite de oliva", "quantity": 100.0, "unit": "ml"}, {"name": "sal", "quantity": 1.0, "unit": "pizca"}]',
@@ -134,7 +134,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 3. Añadir aceite de oliva lentamente
 4. Escurrir la pasta y mezclar con el pesto
 5. Decorar con piñones tostados y queso rallado',
-    'https://images.pexels.com/photos/34485646/pexels-photo-34485646.jpeg',
+    'https://i.ibb.co/Gfy030ss/pexels-stefan-popescu-1765319-34485646.jpg',
     2,
     true,
     '[{"name": "pasta", "quantity": 250.0, "unit": "g"}, {"name": "albahaca fresca", "quantity": 50.0, "unit": "g"}, {"name": "piñones", "quantity": 30.0, "unit": "g"}, {"name": "queso parmesano", "quantity": 50.0, "unit": "g"}, {"name": "aceite de oliva", "quantity": 80.0, "unit": "ml"}, {"name": "ajo", "quantity": 2.0, "unit": "dientes"}]',
@@ -148,7 +148,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 3. Poner todos los ingredientes en la licuadora
 4. Licuar hasta obtener textura suave
 5. Servir inmediatamente con hielo',
-    'https://images.pexels.com/photos/12050010/pexels-photo-12050010.jpeg',
+    'https://i.ibb.co/V0dN1Wnq/pexels-ifreestock-616833.jpg',
     2,
     true,
     '[{"name": "espinacas", "quantity": 50.0, "unit": "g"}, {"name": "plátano", "quantity": 1.0, "unit": "unidad"}, {"name": "manzana", "quantity": 1.0, "unit": "unidad"}, {"name": "yogur natural", "quantity": 150.0, "unit": "ml"}, {"name": "miel", "quantity": 1.0, "unit": "cucharada"}, {"name": "hielo", "quantity": 4.0, "unit": "cubitos"}]',
@@ -163,7 +163,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 4. Añadir rodajas de limón
 5. Hornear durante 15-20 minutos
 6. Servir con verduras al vapor',
-    'https://images.pexels.com/photos/12077942/pexels-photo-12077942.jpeg',
+    'https://i.ibb.co/1txrvh9H/pexels-ranya-obeidallah-535160914-16507285.jpg',
     2,
     true,
     '[{"name": "salmón", "quantity": 2.0, "unit": "filetes"}, {"name": "limón", "quantity": 1.0, "unit": "unidad"}, {"name": "aceite de oliva", "quantity": 2.0, "unit": "cucharadas"}, {"name": "eneldo fresco", "quantity": 1.0, "unit": "cucharada"}, {"name": "sal", "quantity": 1.0, "unit": "pizca"}, {"name": "pimienta", "quantity": 1.0, "unit": "pizca"}]',
@@ -178,7 +178,7 @@ INSERT INTO recipes (title, description, instructions, image_path, author_id, is
 4. Incorporar harina y nueces
 5. Hornear 25-30 minutos
 6. Dejar enfriar antes de cortar',
-    'https://images.pexels.com/photos/3026804/pexels-photo-3026804.jpeg',
+    'https://i.ibb.co/v451FbFd/pexels-ella-olsson-572949-3026804-1.jpg',
     2,
     true,
     '[{"name": "chocolate negro", "quantity": 200.0, "unit": "g"}, {"name": "mantequilla", "quantity": 150.0, "unit": "g"}, {"name": "azúcar", "quantity": 200.0, "unit": "g"}, {"name": "huevos", "quantity": 3.0, "unit": "unidades"}, {"name": "harina", "quantity": 100.0, "unit": "g"}, {"name": "nueces", "quantity": 80.0, "unit": "g"}]',

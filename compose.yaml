@@ -5,11 +5,11 @@ services:
     image: postgres:16-alpine
     container_name: mealmate-postgres
     environment:
-      POSTGRES_DB: mealmate
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./reset-database.sql:/docker-entrypoint-initdb.d/00-reset-database.sql
@@ -18,7 +18,7 @@ services:
     networks:
       - mealmate-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
