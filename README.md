@@ -226,7 +226,6 @@ graph LR
 | **Hibernate** | 6.6.4 | Implementación JPA |
 | **PostgreSQL** | 16-alpine | Base de datos relacional |
 | **Docker Compose** | 3.8 | Orquestación de contenedores |
-| **Flyway** | - | Migraciones de BD (potencial) |
 
 ### Seguridad
 
