@@ -109,9 +109,6 @@ public class ShoppingListServiceImpl implements ShoppingListService {
         return entity;
     }
 
-    /**
-     * Convierte los ShoppingItem del DTO al modelo
-     */
     private List<ShoppingItem> convertShoppingItems(
             List<com.MealMate.MealMateBackend.shopping.dto.ShoppingItemDTO> dtoItems) {
         if (dtoItems == null) {
