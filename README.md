@@ -541,27 +541,169 @@ MealMateBackend/
 
 ## 🗄️ Modelo de Datos
 
-### Diagrama Entidad-Relación
+# Diagrama Entidad-Relación
 
-```
-┌─────────────┐       ┌──────────────┐       ┌─────────────┐
-│    users    │──────▶│user_preferences│     │   recipes   │
-│   (1:1)     │       │                │     │             │
-└─────────────┘       └──────────────┘       └─────────────┘
-       │                      │                      │
-       │                      │                      │
-       ▼                      ▼                      ▼
-┌─────────────┐       ┌──────────────┐       ┌─────────────┐
-│ meal_plans  │──────▶│meal_plan_items│◀──────│ nutrition_info│
-│             │       │   (N:M)       │       │   (1:1)     │
-└─────────────┘       └──────────────┘       └─────────────┘
-       │                                            │
-       │                                            │
-       ▼                                            ▼
-┌─────────────┐                             ┌─────────────┐
-│shopping_lists│                            │   ratings   │
-│             │                              │  (N:M)      │
-└─────────────┘                             └─────────────┘
+```mermaid
+erDiagram
+    users ||--o| user_preferences : "has"
+    users ||--o| roles : "has role"
+    users ||--o{ meal_plans : "creates"
+    users ||--o{ shopping_lists : "owns"
+    users ||--o{ recipes : "authors"
+    users }o--o{ user_allergens : "has"
+    users }o--o{ favorites : "favorites"
+    users }o--o{ ratings : "rates"
+    users }o--o{ recipe_permissions : "has access"
+    
+    recipes ||--o| nutrition_info : "has"
+    recipes ||--o{ meal_plan_items : "included in"
+    recipes }o--o{ recipe_allergens : "contains"
+    recipes }o--o{ recipe_permissions : "shared with"
+    recipes }o--o| meal_types : "belongs to"
+    
+    meal_plans ||--o{ meal_plan_items : "contains"
+    meal_plans ||--o{ shopping_lists : "generates"
+    
+    meal_plan_items }o--|| meal_types : "is type"
+    
+    user_preferences }o--o| diets : "follows"
+    
+    allergens ||--o{ user_allergens : "affects"
+    allergens ||--o{ recipe_allergens : "present in"
+    
+    users {
+        bigint id PK
+        varchar username UK
+        varchar email UK
+        varchar password
+        varchar avatar
+        text bio
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+        int role_id FK
+    }
+    
+    roles {
+        int id PK
+        varchar name UK
+    }
+    
+    recipes {
+        bigint id PK
+        varchar title
+        text description
+        text instructions
+        varchar image_path
+        bigint author_id FK
+        boolean is_public
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+        numeric avg_rating
+        int rating_count
+        jsonb ingredients
+        int meal_type_id FK
+    }
+    
+    nutrition_info {
+        bigint recipe_id PK,FK
+        numeric calories
+        numeric protein
+        numeric carbs
+        numeric fat
+        numeric portion_size
+    }
+    
+    meal_plans {
+        bigint id PK
+        bigint user_id FK
+        date start_date
+        date end_date
+        timestamp created_at
+        boolean is_active
+    }
+    
+    meal_plan_items {
+        bigint id PK
+        bigint meal_plan_id FK
+        bigint recipe_id FK
+        int meal_type_id FK
+        date date
+    }
+    
+    meal_types {
+        int id PK
+        varchar name UK
+    }
+    
+    shopping_lists {
+        bigint id PK
+        bigint user_id FK
+        bigint meal_plan_id FK
+        date week_start_date
+        date week_end_date
+        varchar title
+        timestamp created_at
+        timestamp updated_at
+        jsonb items
+    }
+    
+    ratings {
+        bigint recipe_id PK,FK
+        bigint user_id PK,FK
+        int score
+    }
+    
+    favorites {
+        bigint user_id PK,FK
+        bigint recipe_id PK,FK
+        timestamp created_at
+    }
+    
+    user_preferences {
+        bigint user_id PK,FK
+        int daily_calories_goal
+        numeric daily_carbs_goal
+        numeric daily_protein_goal
+        numeric daily_fat_goal
+        int diet_id FK
+        boolean use_automatic_calculation
+        varchar gender
+        int age
+        numeric weight
+        numeric height
+        varchar activity_level
+        varchar goal
+    }
+    
+    diets {
+        int id PK
+        varchar name UK
+    }
+    
+    allergens {
+        int id PK
+        varchar name UK
+    }
+    
+    user_allergens {
+        bigint id PK
+        bigint user_id FK
+        int allergen_id FK
+    }
+    
+    recipe_allergens {
+        bigint id PK
+        bigint recipe_id FK
+        int allergen_id FK
+    }
+    
+    recipe_permissions {
+        bigint id PK
+        bigint recipe_id FK
+        bigint user_id FK
+    }
 ```
 
 ### Tablas Principales
