@@ -39,6 +39,8 @@ public class SecurityConfig {
                 
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/users").permitAll()
                 
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/users/**").permitAll()
+
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/recipes/**").permitAll()
                 
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/meal-types").permitAll()
